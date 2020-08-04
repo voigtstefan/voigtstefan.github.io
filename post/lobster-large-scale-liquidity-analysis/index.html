@@ -1,0 +1,1151 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="A short  series of posts on handling high-frequency data from Lobster and R">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/lobster-large-scale-liquidity-analysis/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="rgb(237, 65, 77)">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+    
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cutive+Mono%7CLora:400,700%7CRoboto:400,700&display=swap">
+    
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/lobster-large-scale-liquidity-analysis/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Stefan Voigt">
+  <meta property="og:url" content="/post/lobster-large-scale-liquidity-analysis/">
+  <meta property="og:title" content="LobsteR - Analysing a Decade of High-Frequency Trading | Stefan Voigt">
+  <meta property="og:description" content="A short  series of posts on handling high-frequency data from Lobster and R"><meta property="og:image" content="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png">
+  <meta property="twitter:image" content="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2020-03-27T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-04-03T20:07:23&#43;01:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/lobster-large-scale-liquidity-analysis/"
+  },
+  "headline": "LobsteR - Analysing a Decade of High-Frequency Trading",
+  
+  "datePublished": "2020-03-27T00:00:00Z",
+  "dateModified": "2020-04-03T20:07:23+01:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Stefan Voigt"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Stefan Voigt",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_192x192_fill_lanczos_center_2.png"
+    }
+  },
+  "description": "A short  series of posts on handling high-frequency data from Lobster and R"
+}
+</script>
+
+  
+
+  
+
+
+  
+  
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.js" integrity="sha256-5VhCqFam2Cn+yjw61zbBNrbHVJ6SRydPeKopYlngbiQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.css" integrity="sha256-zQ0LblD/Af8vOppw18+2anxsuaz3pWYyVWi+bTvTH8Q=" crossorigin="anonymous">
+  
+  <script>
+  window.addEventListener("load", function(){
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "rgb(237, 65, 77)",
+          "text": "#fff"
+        },
+        "button": {
+          "background": "#fff",
+          "text": "rgb(237, 65, 77)"
+        }
+      },
+      "theme": "classic",
+      "content": {
+        "message": "This website uses cookies to ensure you get the best experience on our website.",
+        "dismiss": "Got it!",
+        "link": "Learn more",
+        "href": "https://www.cookiesandyou.com"
+      }
+    })});
+  </script>
+
+
+
+  
+
+
+
+
+
+  <title>LobsteR - Analysing a Decade of High-Frequency Trading | Stefan Voigt</title>
+
+</head>
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Stefan Voigt</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Stefan Voigt</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#publications"><span>Publications</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#teaching"><span>Teaching</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/files/1_Voigt_CV.pdf"><span>CV</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>LobsteR - Analysing a Decade of High-Frequency Trading</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+  
+  
+  <div>
+    
+
+  
+  <span >Stefan Voigt</span>
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    Apr 3, 2020
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    3 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+<p>After the warm-up <a href="../../post/lobster-1">in the last post</a>, I’ll move to a more serious analysis of data from <a href="www.lobsterdata.com">Lobster</a>.</p>
+<title>
+Shina App Iframe
+</title>
+<iframe id="monthly" src="https://voigtstefan.shinyapps.io/monthly_spy_data/" style="border:none; width:100%; height:850px" frameborder="0">
+</iframe>
+<div id="downloading-and-extracting-massive-data" class="section level2">
+<h2>Downloading and extracting massive data</h2>
+<p>First, I requested <strong>all</strong> orderbook messages from <a href="www.lobsterdata.com">Lobster</a> up to level 10 from June 2007 until March 2020. During that period, <strong>SPY</strong> trading was very active: I observe more than 4.26 billion messages. Total trading volume of <strong>SPY</strong> on NASDAQ during that period exceeded 5.35 Trillion USD.</p>
+<p><img src="/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/spyder_get_data.PNG" /></p>
+<p>Lobster compiles the data on request and provides downloadable .7z files after processing the messages. To download everything (on a Linux machine), it is advisable to make use of <code>wget</code> (you’ll have to replace <code>username</code>, <code>password</code> and <code>user_id</code> with your own credentials):</p>
+<pre><code>wget -bqc -P lobster_raw ftp://username:password@lobsterdata.com/user_id/*</code></pre>
+<p>As a next step, extract the .7z files before working with the individual files - although it is possible to read in the files from within the zipped folder, I made the experience that this can cause problems when done in parallel.</p>
+<pre><code>7z e .lobster_raw/SPY_2019-06-27_2020-03-26_10.7z -o./data/lobster
+7z e .lobster_raw/SPY_2018-06-27_2019-06-26_10.7z -o./data/lobster
+7z e .lobster_raw/SPY_2017-06-27_2018-06-26_10.7z -o./data/lobster
+....</code></pre>
+<p>3208 trading days occupy roughly 3.2 Terabyte of hard drive space. As explained in my previous post, I compute summary statistics for each single day in my sample. For the sake of brevity, the code snippet below is everything needed to do this in a straightforward parallel fashion using Slurm Workload Manager (the actual task <code>01_summarise_lobster_messages.R</code> can be downloaded <a href="/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/01_summarise_lobster_messages.R">here</a>).</p>
+<pre><code>#$ -N lobster_summary
+#$ -t 1:3208
+#$ -e SPY_Investigation/Chunk
+#$ -o SPY_Investigation/Chunk
+R-g --vanilla &lt; SPY_Investigation/01_summarise_lobster_messages.R</code></pre>
+</div>
+<div id="merge-and-summarise" class="section level2">
+<h2>Merge and summarise</h2>
+<p>Next, I merge and evaluate the resulting files.</p>
+<pre class="r"><code># Required packages
+library(tidyverse)
+library(lubridate)
+
+# Asset and Date information
+asset &lt;- &quot;SPY&quot;
+existing_files &lt;- dir(pattern=paste0(&quot;LOBSTER_&quot;, asset, &quot;.*_summary.csv&quot;), 
+                      path=&quot;output/summary_files&quot;,
+                      full.names = TRUE)
+
+summary_data &lt;- map(existing_files, function(x)
+  {read_csv(x, 
+            col_names = TRUE, 
+            cols(ts_minute = col_datetime(format = &quot;&quot;),
+                 midquote = col_double(),
+                 spread = col_double(),
+                 volume = col_double(),
+                 hidden_volume = col_double(),
+                 depth_bid = col_double(),
+                 depth_ask = col_double(),
+                 depth_bid_5 = col_double(),
+                 depth_ask_5 = col_double(),
+                 messages = col_double()))})
+summary_data &lt;- summary_data %&gt;% bind_rows()
+
+write_csv(summary_data, paste0(&quot;output/LOBSTER_&quot;,asset,&quot;_summary.csv&quot;))</code></pre>
+</div>
+<div id="spy-depth-is-at-an-all-time-low" class="section level2">
+<h2>SPY Depth is at an all-time low</h2>
+<p>In their paper <a href="http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2463066">Bid Price Dispersion</a>, <a href="www.albertjmenkveld.com">Albert Menkveld</a> and <a href="https://as.nyu.edu/faculty/boyan-jovanovic.html">Boyan Jovanovic</a> document (among many other interesting things) a striking downwards trend in <em>depth</em> of the orderbook of <strong>SPY</strong>, the most actively traded ETF in the world.</p>
+<pre class="r"><code>data_by_date &lt;- data %&gt;% 
+  mutate (date = ymd(floor_date(ts_minute, &quot;day&quot;))) %&gt;%
+  group_by(date) %&gt;% 
+  select(-ts_minute) %&gt;% 
+  summarise_all(median)</code></pre>
+<p>Feel free to play around with the Shiny Gadget at the beginning of the post to convince yourself: We see a negative trend in quoted spreads (apart from a couple of outliers) but as the figure below simultaneously shows, quoted depth at the best level as well as 5 basis points apart from the concurrent midquote decreased as well - note the extreme drop in liquidity provisioning since the beginning of 2020. The red line in the figure shows the daily average number of shares at the best ask (blue line corresponds to the bid). The dashed lines correspond to depth at 5 basis points (the number of shares available within 5 basis points from the midquote). Note that the y-axis is in a log scale, thus the figure hints at much more mass of the depth around the best levels.
+<img src="/./2020-03-27-lobster-large-scale-liquidity-analysis_files/spy_depth.png" /></p>
+</div>
+<div id="covid19-and-the-sp500" class="section level2">
+<h2>COVID19 and the SP500</h2>
+<p>Needless to say, COVID19 caused turbulent days for global financial markets. The figure below illustrates how quoted liquidity and trading activity changed since January 13th, 2020, the first day WHO reported a case outside of China. More specifically, I plot the intra-daily dynamics of some of the derived measures for the entire year 2019 and the last couple of weeks.</p>
+<pre class="r"><code>corona_threshold &lt;- &quot;2020-01-13&quot;
+
+bin_data &lt;- data %&gt;% mutate(
+  bin = ymd_hms(cut(ts_minute, &quot;5 min&quot;)),
+  bin = strftime(bin, format=&quot;%H:%M:%S&quot;),
+  bin = as.POSIXct(bin, format=&quot;%H:%M:%S&quot;)) %&gt;%
+  select(bin, everything()) %&gt;% 
+  filter(ts_minute &gt; &quot;01-01-2019&quot;,
+         (hour(bin)&gt;&quot;09&quot; &amp; minute(bin)&gt;&quot;35&quot;) | (hour(bin)&lt;=&quot;15&quot; &amp; minute(bin)&lt;&quot;55&quot;)) %&gt;% 
+  group_by(bin, Corona = ts_minute&gt;=corona_threshold) %&gt;% 
+  summarise_all(list(mean=mean)) </code></pre>
+<title>
+Shina App Iframe
+</title>
+<iframe id="intradata" src=" https://voigtstefan.shinyapps.io/bin_data/" style="border:none; width:100%; height:850px" frameborder="0">
+</iframe>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/lobster-large-scale-liquidity-analysis/&amp;text=LobsteR%20-%20Analysing%20a%20Decade%20of%20High-Frequency%20Trading" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/lobster-large-scale-liquidity-analysis/&amp;t=LobsteR%20-%20Analysing%20a%20Decade%20of%20High-Frequency%20Trading" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=LobsteR%20-%20Analysing%20a%20Decade%20of%20High-Frequency%20Trading&amp;body=/post/lobster-large-scale-liquidity-analysis/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/lobster-large-scale-liquidity-analysis/&amp;title=LobsteR%20-%20Analysing%20a%20Decade%20of%20High-Frequency%20Trading" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=LobsteR%20-%20Analysing%20a%20Decade%20of%20High-Frequency%20Trading%20/post/lobster-large-scale-liquidity-analysis/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/lobster-large-scale-liquidity-analysis/&amp;title=LobsteR%20-%20Analysing%20a%20Decade%20of%20High-Frequency%20Trading" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/lobster-1/">LobsteR - NASDAQ under a &#34;tidy&#34; Microscope</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = false;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.66c553246b0f279a03be6e5597f72b52.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    
+    Published with
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic Website Builder</a>
+    
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Stefan Voigt</title>
+    <link>/</link>
+      <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <description>Stefan Voigt</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 19 May 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png</url>
+      <title>Stefan Voigt</title>
+      <link>/</link>
+    </image>
+    
+    <item>
+      <title>Liquidity and Price Informativeness in Blockchain-Based Markets</title>
+      <link>/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</link>
+      <pubDate>Tue, 19 May 2020 00:00:00 +0000</pubDate>
+      <guid>/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Connect Four - Deep Reinforcement Learning</title>
+      <link>/post/connectx/</link>
+      <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>/post/connectx/</guid>
+      <description>&lt;p&gt;I recently stumbled uppon 
+&lt;a href=&#34;https://www.kaggle.com/c/connectx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;the amazing Connect Kaggle Competition&lt;/a&gt; and I tried to improve my humble knowledge on reinforcement learning by participating in this challenge.&lt;/p&gt;
+&lt;h2 id=&#34;the-task&#34;&gt;The task&lt;/h2&gt;
+&lt;p&gt;Very simple: Write an agent that plays &lt;strong&gt;
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Connect_Four&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Connect Four&lt;/a&gt;&lt;/strong&gt; against competing algorithms. 
+&lt;img src=&#34;/post/2020-03-27-connectx_files/connectx.PNG&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;my-way-to-tackle-it-deep-q-learning&#34;&gt;My way to tackle it: &amp;ldquo;Deep&amp;rdquo; Q-Learning&lt;/h3&gt;
+&lt;p&gt;Sure, I could write some deterministic code on how to proceed in the game but what I actually implement is a seemingly brute-force method: Let the agent play the game over and over again and learn the rules the hard way. More specifically, the agents receives information on the current &lt;em&gt;observation&lt;/em&gt; (the current state of the board) and then has to take an &lt;em&gt;action&lt;/em&gt; (which slot to choose to add a coin). After that, nature responses with a new state and potentially yields a reward (if the game is won) or a penalty (if the game is lost or if the agent chooses an action that is not valid - such as putting a coin into an already full slot).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-03-27-connectx_files/reinforcement_learning.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;How should the agent decide on her &lt;em&gt;action&lt;/em&gt;? In finance, the concept of dynamic programming, more specifically, the Bellman-equation, is well-known: Aim at actions that yield the highest expected reward. You can do so, by value each &lt;em&gt;(action, state)&lt;/em&gt; pair with respect to the immediate rewards and the transition into the &lt;em&gt;next_state&lt;/em&gt;. More specifically, you value an &lt;em&gt;action&lt;/em&gt; $a$ given the current &lt;em&gt;state&lt;/em&gt; $s_t$ as&lt;/p&gt;
+&lt;p&gt;$$Q(a, s_t) = r + \gamma\max\limits_{a&amp;rsquo;}\hat{Q}(a&amp;rsquo;, s_{t+1})$$&lt;/p&gt;
+&lt;p&gt;where $\gamma$ is a discount factor and $\hat{Q}$ is the (predicted) value of the next state.
+If we&amp;rsquo;d play a simpler game, we could try to store all possible &lt;em&gt;(action, state)&lt;/em&gt; pairs and compute the optimal action. However, &lt;em&gt;Connect Four&lt;/em&gt; in its basic fashion has 
+&lt;a href=&#34;https://math.stackexchange.com/questions/301106/how-many-different-game-situations-has-connect-four&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;4531985219092&lt;/a&gt; different possible states, so good luck with that aproach (which would be called Q-Learning, by the way).&lt;/p&gt;
+&lt;p&gt;What I do instead, is approximating this function using a Neural network, simply because I have always wanted to implement something like this. The python kernel below summarises my implementation and tremendously benefits from 
+&lt;a href=&#34;https://www.kaggle.com/phunghieu/connectx-with-q-learning&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hieu Phungs work on Q-Learning&lt;/a&gt; and 
+&lt;a href=&#34;https://keon.github.io/deep-q-learning/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Keon Kims blog&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;initialization&#34;&gt;Initialization&lt;/h2&gt;
+&lt;p&gt;Below packages are setting up the environment. Kaggle provides an entire framework to test your agent. &lt;code&gt;keras&lt;/code&gt; is using the &lt;code&gt;TensorFlow&lt;/code&gt; backend to handle the neural network.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import gym
+import numpy as np
+from math import exp, log
+#import random
+from random import choice, uniform
+from collections import deque
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam
+from kaggle_environments import evaluate, make
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Using TensorFlow backend.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;define-environment&#34;&gt;Define Environment&lt;/h2&gt;
+&lt;p&gt;The ConnectX environment below allows to play around with the setup in a clean &amp;lsquo;gym&amp;rsquo; style which makes it very easy to interact with current states. In order to train my agent properly, the &lt;code&gt;switch_side&lt;/code&gt; and &lt;code&gt;switch_trainer&lt;/code&gt; functions are called whenever we start a new game. Therefore, the agent (hopefully) learns to play on both sides of the board against the provided &lt;code&gt;negamax&lt;/code&gt; and the &lt;code&gt;random&lt;/code&gt; opponent (&lt;code&gt;random&lt;/code&gt; just drops coins into arbitrarily chosen slots). For the purpose of illustrating the code, I switch the &lt;code&gt;negamax&lt;/code&gt; function of, however.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class ConnectX(gym.Env):
+    
+    def __init__(self, switch_prob=0.5):
+        self.env = make(&#39;connectx&#39;, debug=True)
+        self.pair = [None, &#39;random&#39;]
+        self.trainer = self.env.train(self.pair)
+        self.switch_prob = switch_prob
+        config = self.env.configuration
+        self.action_space = gym.spaces.Discrete(config.columns)
+        self.observation_space = gym.spaces.Box(low=0, high=2, shape=(config.rows,config.columns,1), dtype=np.int)
+
+    def switch_side(self):
+        self.pair = self.pair[::-1]
+        self.trainer = self.env.train(self.pair)
+    
+    def switch_trainer(self):
+        current_trainer_random = &#39;random&#39; in self.pair 
+        if current_trainer_random:
+            self.pair = [None, &#39;negamax&#39;]
+        else:
+            self.pair = [None, &#39;random&#39;]
+        self.trainer = self.env.train(self.pair)
+    
+    def step(self, action):
+        return self.trainer.step(action)
+    
+    def reset(self):
+        if random.uniform(0, 1) &amp;lt; self.switch_prob: # switch side
+            self.switch_side()
+        #if random.uniform(0, 1) &amp;lt; self.switch_prob: # switch trainer
+        #    self.switch_trainer()        
+        return self.trainer.reset()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;deep-learning-agent&#34;&gt;Deep Learning Agent&lt;/h2&gt;
+&lt;p&gt;I am really not an expert in neural nets. Thus, all I do is playing around a bit. The magic in defining the agent as below is happening in the &lt;code&gt;replay&lt;/code&gt; function: After gathering some experience, a neural network is trained to make sense of the &lt;code&gt;state&lt;/code&gt;, &lt;code&gt;action&lt;/code&gt; and &lt;code&gt;reward&lt;/code&gt; relationship. The &lt;code&gt;target&lt;/code&gt; is set such that the network aims at minimizing the loss between predicting the reward of the &lt;code&gt;next_state&lt;/code&gt; and the realized reward.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Deep Q-learning Agent
+class DQNAgent:
+
+    def __init__(self, state_size, action_size, episodes):
+        self.state_size = state_size
+        self.action_size = action_size
+        self.memory = deque(maxlen=500)
+        self.gamma = 0.9   # discount rate
+        self.epsilon = 0.10  # initial exploration rate
+        self.epsilon_min = 0.01
+        self.epsilon_decay = exp((log(self.epsilon_min) - log(self.epsilon))/(0.8*episodes)) # reaches epsilon_min after 80% of iterations
+        self.model = self._build_model()
+    
+    def _build_model(self):
+        # Neural Net for Deep-Q learning Model
+        model = Sequential()
+        model.add(Dense(20, input_dim=self.state_size, activation=&#39;relu&#39;))
+        model.add(Dense(50, activation=&#39;relu&#39;))
+        model.add(Dense(self.action_size, activation=&#39;linear&#39;))
+        model.compile(loss=&#39;mse&#39;,
+                      optimizer=Adam(lr = 0.00001))
+        return model
+    
+    def memorize(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
+    
+    def act(self, state):
+        if np.random.rand() &amp;lt;= self.epsilon: # Exploration
+            return choice([c for c in range(self.action_size) if state[:,c] == 0])
+            #when exploring, I allow for &amp;quot;wrong&amp;quot; moves to give the agent a chance 
+            #to experience the penalty of choosing full columns
+            #return choice([c for c in range(self.action_size)])
+        act_values = self.model.predict(state) # Exploitation
+        action = np.argmax(act_values[0]) 
+        return action
+    
+    def replay(self, batch_size):
+        minibatch = random.sample(self.memory, batch_size)
+        for state, action, reward, next_state, done in minibatch:
+            target = reward
+            if not done:
+                target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+            target_f = self.model.predict(state)
+            target_f[0][action] = target
+            self.model.fit(state, target_f, epochs=1, verbose=0)
+        if self.epsilon &amp;gt; self.epsilon_min:
+            self.epsilon *= self.epsilon_decay
+
+    def load(self, name):
+        self.model.load_weights(name)
+    
+    def save(self, name):
+        self.model.save_weights(name)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;train-the-agent&#34;&gt;Train the agent&lt;/h2&gt;
+&lt;p&gt;Training is nothing as iteratively playing against the trainer, memorizing what happened and updating the neural net weights after each iteration. Notable thing here is that I let the agent also learn what a valid move is the hard way (a move is invalid if the agent chooses a column which is already full). After an invalid move the game is over (&lt;code&gt;done = True&lt;/code&gt;) and I penalize invalid actions hard.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# initialize gym environment and the agent
+env = ConnectX(switch_prob = 0.5)
+state_size = env.observation_space.shape[1]*env.observation_space.shape[0]
+action_size = env.observation_space.shape[1]
+episodes = 40000
+agent = DQNAgent(state_size, action_size, episodes)
+agent.load(&amp;quot;./connectX-weights_deep.h5&amp;quot;) # load prelearned weights
+batch_size = 40 # Don&#39;t know if this number makes sense
+
+# Monitoring devices
+all_total_rewards = np.empty(episodes)
+all_avg_rewards = np.empty(episodes)
+
+# Iterate the game
+for e in range(episodes):
+    # reset state in the beginning of each game
+    done = False
+    state = env.reset()
+    total_rewards = 0
+    while not done:
+        # Decide action
+        action = int(agent.act(np.array([state.board])))
+        next_state, reward, done, _ = env.step(action)
+        if not done:
+            reward = 0.0/42 # default: reward of 0.5 if not done/ 1 if win/ 0 if lost
+        if done:
+            if reward == 1: # Won
+                reward = 1
+            elif reward == 0: # Lost
+                reward = -1
+            else: # Draw
+                reward = 0
+        if state.board[action]!=0: # invalid move: hard penalization
+            reward = -10
+        agent.memorize(np.array([state.board]), action, reward, np.array([next_state.board]), done)
+        # make next_state the new current state for the next frame.
+        state = next_state
+        total_rewards += reward
+    if len(agent.memory) &amp;gt; batch_size:
+        agent.replay(batch_size)
+        all_total_rewards[e] = total_rewards
+        avg_reward = all_total_rewards[max(0, e - 100):e].mean()
+        all_avg_rewards[e] = avg_reward
+        if e % 100 == 0 :
+            agent.save(&amp;quot;./connectX-weights_deep.h5&amp;quot;)
+            print(&amp;quot;episode: {}/{}, epsilon: {:.2f}, average: {:.2f}&amp;quot;.format(e, episodes, agent.epsilon, avg_reward))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After &lt;em&gt;a lot&lt;/em&gt; of training (millions of iterations with a prescheduled decreasing learning rate), the agent seems to have learned quite a bit: although I do not prevent the agent from choosing invalid actions, after some time such events basically do not happen anymore. Further, the agent starts winning against the &lt;code&gt;random&lt;/code&gt; opponent with a fast increasing frequency.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;episode: 39100/40000, epsilon: 0.01, average: 0.66
+Invalid Action: Invalid column: 1
+episode: 39200/40000, epsilon: 0.01, average: 0.65
+episode: 39300/40000, epsilon: 0.01, average: 0.64
+episode: 39400/40000, epsilon: 0.01, average: 0.78
+episode: 39500/40000, epsilon: 0.01, average: 0.70
+episode: 39600/40000, epsilon: 0.01, average: 0.68
+episode: 39700/40000, epsilon: 0.01, average: 0.72
+episode: 39800/40000, epsilon: 0.01, average: 0.68
+episode: 39900/40000, epsilon: 0.01, average: 0.64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;did-the-agent-learn-anything&#34;&gt;Did the agent learn anything?&lt;/h2&gt;
+&lt;p&gt;The learned weights are used to compute &lt;code&gt;actions&lt;/code&gt; of the agent during the games. The figure below shows the average rewards gained by the trained agent (including the penalty for chosing invalid actions).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import matplotlib.pyplot as plt
+plt.plot(all_avg_rewards)
+plt.xlabel(&#39;Episode&#39;)
+plt.ylabel(&#39;Avg rewards (100)&#39;)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-03-27-connectx_files/output_10_0.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Finally, the real-life test: Submission of the agent to Kaggle. The procedure is somewhat cumbersome procedure because Kaggle does not allow &lt;code&gt;keras&lt;/code&gt; modules for submission but the below procedure seems to work&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;model = Sequential()
+model = Sequential()
+model.add(Dense(20, input_dim=state_size, activation=&#39;relu&#39;))
+model.add(Dense(50, activation=&#39;relu&#39;))
+model.add(Dense(action_size, activation=&#39;linear&#39;))
+model.load_weights(&#39;connectX-weights_deep.h5&#39;)
+
+layers = []
+
+# Get all layers&#39; weights
+for i in range(3):
+    weights, biases = model.layers[i].get_weights()
+    layers.extend([weights, biases])
+
+fc_layers = list(map(
+    lambda x: str(list(np.round(x, 8))) \
+        .replace(&#39;array(&#39;, &#39;&#39;).replace(&#39;)&#39;, &#39;&#39;) \
+        .replace(&#39; &#39;, &#39;&#39;) \
+        .replace(&#39;\n&#39;, &#39;&#39;) \
+        .replace(&#39;,dtype=float32&#39;,&#39;&#39;),
+    layers
+))
+fc_layers = np.reshape(fc_layers, (-1, 2))
+
+# Create the agent
+my_agent = &#39;&#39;&#39;def my_agent(observation, configuration):
+    import numpy as np
+
+&#39;&#39;&#39;
+# Write hidden layers
+for i, (w, b) in enumerate(fc_layers[:-1]):
+    my_agent += &#39;    hl{}_w = np.array({}, dtype=np.float32)\n&#39;.format(i+1, w)
+    my_agent += &#39;    hl{}_b = np.array({}, dtype=np.float32)\n&#39;.format(i+1, b)
+
+my_agent += &#39;    ol_w = np.array({}, dtype=np.float32)\n&#39;.format(fc_layers[-1][0])
+my_agent += &#39;    ol_b = np.array({}, dtype=np.float32)\n&#39;.format(fc_layers[-1][1])
+my_agent += &#39;&#39;&#39;
+    state = observation.board[:]
+#    state.append(observation.mark)
+    out = np.array(state, dtype=np.float32)
+&#39;&#39;&#39;
+
+for i in range(len(fc_layers[:-1])):
+    my_agent += &#39;    out = np.matmul(out, hl{0}_w) + hl{0}_b\n&#39;.format(i+1)
+    my_agent += &#39;    out = 1/(1 + np.exp(-out))\n&#39; # Sigmoid function
+
+my_agent += &#39;    out = np.matmul(out, ol_w) + ol_b\n&#39;
+my_agent += &#39;&#39;&#39;
+    for i in range(configuration.columns):
+        if observation.board[i] != 0:
+            out[i] = -1e7
+
+    return int(np.argmax(out))
+    &#39;&#39;&#39;
+
+with open(&#39;submission.py&#39;, &#39;w&#39;) as f:
+    f.write(my_agent)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;yes-she-did&#34;&gt;Yes, she did!&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from submission import my_agent
+
+env = make(&amp;quot;connectx&amp;quot;, debug=True)
+env.run([my_agent, my_agent])
+print(&amp;quot;Success!&amp;quot; if env.state[0].status == env.state[1].status == &amp;quot;DONE&amp;quot; else &amp;quot;Failed...&amp;quot;)
+
+def mean_reward(rewards):
+    return sum(r[0] for r in rewards) / sum(r[0] + r[1] for r in rewards)
+
+# Run multiple episodes to estimate agent&#39;s performance.
+print(&amp;quot;My Agent vs. Random Agent:&amp;quot;, mean_reward(evaluate(&amp;quot;connectx&amp;quot;, [my_agent, &amp;quot;random&amp;quot;], num_episodes=50)))
+print(&amp;quot;Random Agent vs. My Agent:&amp;quot;, mean_reward(evaluate(&amp;quot;connectx&amp;quot;, [&amp;quot;random&amp;quot;, my_agent], num_episodes=50)))
+#print(&amp;quot;My Agent vs. Negamax Agent:&amp;quot;, mean_reward(evaluate(&amp;quot;connectx&amp;quot;, [my_agent, &amp;quot;negamax&amp;quot;], num_episodes=10)))
+#print(&amp;quot;Negamax Agent vs. My Agent:&amp;quot;, mean_reward(evaluate(&amp;quot;connectx&amp;quot;, [&amp;quot;negamax&amp;quot;, my_agent], num_episodes=10)))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So it seems that Deep-Q-Learning helped: by just playing against an random agent, the neural network was trained to win the game - even without knowing the rules in advance!&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;My Agent vs. Random Agent: 0.88
+Random Agent vs. My Agent: 0.24
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>LobsteR - Analysing a Decade of High-Frequency Trading</title>
+      <link>/post/lobster-large-scale-liquidity-analysis/</link>
+      <pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>/post/lobster-large-scale-liquidity-analysis/</guid>
+      <description>
+
+
+&lt;p&gt;After the warm-up &lt;a href=&#34;../../post/lobster-1&#34;&gt;in the last post&lt;/a&gt;, I’ll move to a more serious analysis of data from &lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt;.&lt;/p&gt;
+&lt;title&gt;
+Shina App Iframe
+&lt;/title&gt;
+&lt;iframe id=&#34;monthly&#34; src=&#34;https://voigtstefan.shinyapps.io/monthly_spy_data/&#34; style=&#34;border:none; width:100%; height:850px&#34; frameborder=&#34;0&#34;&gt;
+&lt;/iframe&gt;
+&lt;div id=&#34;downloading-and-extracting-massive-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Downloading and extracting massive data&lt;/h2&gt;
+&lt;p&gt;First, I requested &lt;strong&gt;all&lt;/strong&gt; orderbook messages from &lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt; up to level 10 from June 2007 until March 2020. During that period, &lt;strong&gt;SPY&lt;/strong&gt; trading was very active: I observe more than 4.26 billion messages. Total trading volume of &lt;strong&gt;SPY&lt;/strong&gt; on NASDAQ during that period exceeded 5.35 Trillion USD.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/spyder_get_data.PNG&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Lobster compiles the data on request and provides downloadable .7z files after processing the messages. To download everything (on a Linux machine), it is advisable to make use of &lt;code&gt;wget&lt;/code&gt; (you’ll have to replace &lt;code&gt;username&lt;/code&gt;, &lt;code&gt;password&lt;/code&gt; and &lt;code&gt;user_id&lt;/code&gt; with your own credentials):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;wget -bqc -P lobster_raw ftp://username:password@lobsterdata.com/user_id/*&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As a next step, extract the .7z files before working with the individual files - although it is possible to read in the files from within the zipped folder, I made the experience that this can cause problems when done in parallel.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;7z e .lobster_raw/SPY_2019-06-27_2020-03-26_10.7z -o./data/lobster
+7z e .lobster_raw/SPY_2018-06-27_2019-06-26_10.7z -o./data/lobster
+7z e .lobster_raw/SPY_2017-06-27_2018-06-26_10.7z -o./data/lobster
+....&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;3208 trading days occupy roughly 3.2 Terabyte of hard drive space. As explained in my previous post, I compute summary statistics for each single day in my sample. For the sake of brevity, the code snippet below is everything needed to do this in a straightforward parallel fashion using Slurm Workload Manager (the actual task &lt;code&gt;01_summarise_lobster_messages.R&lt;/code&gt; can be downloaded &lt;a href=&#34;/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/01_summarise_lobster_messages.R&#34;&gt;here&lt;/a&gt;).&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#$ -N lobster_summary
+#$ -t 1:3208
+#$ -e SPY_Investigation/Chunk
+#$ -o SPY_Investigation/Chunk
+R-g --vanilla &amp;lt; SPY_Investigation/01_summarise_lobster_messages.R&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;merge-and-summarise&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Merge and summarise&lt;/h2&gt;
+&lt;p&gt;Next, I merge and evaluate the resulting files.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Required packages
+library(tidyverse)
+library(lubridate)
+
+# Asset and Date information
+asset &amp;lt;- &amp;quot;SPY&amp;quot;
+existing_files &amp;lt;- dir(pattern=paste0(&amp;quot;LOBSTER_&amp;quot;, asset, &amp;quot;.*_summary.csv&amp;quot;), 
+                      path=&amp;quot;output/summary_files&amp;quot;,
+                      full.names = TRUE)
+
+summary_data &amp;lt;- map(existing_files, function(x)
+  {read_csv(x, 
+            col_names = TRUE, 
+            cols(ts_minute = col_datetime(format = &amp;quot;&amp;quot;),
+                 midquote = col_double(),
+                 spread = col_double(),
+                 volume = col_double(),
+                 hidden_volume = col_double(),
+                 depth_bid = col_double(),
+                 depth_ask = col_double(),
+                 depth_bid_5 = col_double(),
+                 depth_ask_5 = col_double(),
+                 messages = col_double()))})
+summary_data &amp;lt;- summary_data %&amp;gt;% bind_rows()
+
+write_csv(summary_data, paste0(&amp;quot;output/LOBSTER_&amp;quot;,asset,&amp;quot;_summary.csv&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;spy-depth-is-at-an-all-time-low&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;SPY Depth is at an all-time low&lt;/h2&gt;
+&lt;p&gt;In their paper &lt;a href=&#34;http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2463066&#34;&gt;Bid Price Dispersion&lt;/a&gt;, &lt;a href=&#34;www.albertjmenkveld.com&#34;&gt;Albert Menkveld&lt;/a&gt; and &lt;a href=&#34;https://as.nyu.edu/faculty/boyan-jovanovic.html&#34;&gt;Boyan Jovanovic&lt;/a&gt; document (among many other interesting things) a striking downwards trend in &lt;em&gt;depth&lt;/em&gt; of the orderbook of &lt;strong&gt;SPY&lt;/strong&gt;, the most actively traded ETF in the world.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data_by_date &amp;lt;- data %&amp;gt;% 
+  mutate (date = ymd(floor_date(ts_minute, &amp;quot;day&amp;quot;))) %&amp;gt;%
+  group_by(date) %&amp;gt;% 
+  select(-ts_minute) %&amp;gt;% 
+  summarise_all(median)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Feel free to play around with the Shiny Gadget at the beginning of the post to convince yourself: We see a negative trend in quoted spreads (apart from a couple of outliers) but as the figure below simultaneously shows, quoted depth at the best level as well as 5 basis points apart from the concurrent midquote decreased as well - note the extreme drop in liquidity provisioning since the beginning of 2020. The red line in the figure shows the daily average number of shares at the best ask (blue line corresponds to the bid). The dashed lines correspond to depth at 5 basis points (the number of shares available within 5 basis points from the midquote). Note that the y-axis is in a log scale, thus the figure hints at much more mass of the depth around the best levels.
+&lt;img src=&#34;/./2020-03-27-lobster-large-scale-liquidity-analysis_files/spy_depth.png&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;covid19-and-the-sp500&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;COVID19 and the SP500&lt;/h2&gt;
+&lt;p&gt;Needless to say, COVID19 caused turbulent days for global financial markets. The figure below illustrates how quoted liquidity and trading activity changed since January 13th, 2020, the first day WHO reported a case outside of China. More specifically, I plot the intra-daily dynamics of some of the derived measures for the entire year 2019 and the last couple of weeks.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;corona_threshold &amp;lt;- &amp;quot;2020-01-13&amp;quot;
+
+bin_data &amp;lt;- data %&amp;gt;% mutate(
+  bin = ymd_hms(cut(ts_minute, &amp;quot;5 min&amp;quot;)),
+  bin = strftime(bin, format=&amp;quot;%H:%M:%S&amp;quot;),
+  bin = as.POSIXct(bin, format=&amp;quot;%H:%M:%S&amp;quot;)) %&amp;gt;%
+  select(bin, everything()) %&amp;gt;% 
+  filter(ts_minute &amp;gt; &amp;quot;01-01-2019&amp;quot;,
+         (hour(bin)&amp;gt;&amp;quot;09&amp;quot; &amp;amp; minute(bin)&amp;gt;&amp;quot;35&amp;quot;) | (hour(bin)&amp;lt;=&amp;quot;15&amp;quot; &amp;amp; minute(bin)&amp;lt;&amp;quot;55&amp;quot;)) %&amp;gt;% 
+  group_by(bin, Corona = ts_minute&amp;gt;=corona_threshold) %&amp;gt;% 
+  summarise_all(list(mean=mean)) &lt;/code&gt;&lt;/pre&gt;
+&lt;title&gt;
+Shina App Iframe
+&lt;/title&gt;
+&lt;iframe id=&#34;intradata&#34; src=&#34; https://voigtstefan.shinyapps.io/bin_data/&#34; style=&#34;border:none; width:100%; height:850px&#34; frameborder=&#34;0&#34;&gt;
+&lt;/iframe&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>LobsteR - NASDAQ under a &#34;tidy&#34; Microscope</title>
+      <link>/post/lobster-1/</link>
+      <pubDate>Wed, 25 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>/post/lobster-1/</guid>
+      <description>
+
+
+&lt;p&gt;During my PhD studies, I have been working with high-frequency trading data provided by &lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt; a lot for some of my &lt;a href=&#34;../../publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/&#34;&gt;research projects&lt;/a&gt;.&lt;br /&gt;
+In this short series of posts, I want share some of my code and routines to efficiently handly the extremely large amounts of data that go through NASDAQs servers on a daily basis. In fact, if you look at the figure below, there is plenty to explore: during less than 2 minutes on March 17th, 2020, thousands of trades have been executed for SPY, a large ETF. The red line shows the traded prices during that period and the blue shaded areas show the dynamics of the orderbook. The darker the areas, the &lt;em&gt;more&lt;/em&gt; liquidity (measured as size of the order book levels).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-03-25-lobster-1_files/orderbook_dynamic.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;First, I provide some snippets to read-in Lobster files and to compute some potentially interesting statistics. &lt;a href=&#34;../../post/lobster-large-scale-liquidity-analysis&#34;&gt;In a second post&lt;/a&gt;, I illustrate long-run characteristics of the orderbook dynamics and I’ll finally focus some really recent events: the days since the outbreak of COVID19 have been extremely bumpy for &lt;a href=&#34;https://en.wikipedia.org/wiki/SPDR_S%26P_500_Trust_ETF&#34;&gt;SPY&lt;/a&gt;, the largest ETF in the world and it is amazing to see, how liquidity supply changed during these rough days.&lt;/p&gt;
+&lt;div id=&#34;handling-lobster-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Handling Lobster Data&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt; is an online limit order book data tool to provide easy-to-use, high-quality limit order book data for the entire universe of NASDAQ traded stocks. I requested some of the data based on their online interface and stored it before running the code below.
+The actual data which I will use for the next post is much larger. I downloaded &lt;strong&gt;all&lt;/strong&gt; trading messages for ticker SPY (order submissions, cancellations, trades, …) that went through NASDAQ since July, 27th 2007 until March, 25th, 2020. The files contain the entire orderbooks until level 10.&lt;/p&gt;
+&lt;div id=&#34;first-steps&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;First steps&lt;/h3&gt;
+&lt;p&gt;I work in &lt;strong&gt;R&lt;/strong&gt; with message level data from Lobster in a &lt;em&gt;tidy&lt;/em&gt; and (hopefully) efficient way.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+library(lubridate)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As an example, I illustrate the computations for a tiny glimpse of March 17th, 2020. Lobster files always come with the same naming convention &lt;code&gt;ticker_date_34200000_57600000_filetype_level.csv&lt;/code&gt;, whereas &lt;code&gt;filetype&lt;/code&gt; either denotes &lt;code&gt;message&lt;/code&gt; or the corresponding &lt;code&gt;orderbook&lt;/code&gt; snapshots.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;asset &amp;lt;- &amp;quot;SPY&amp;quot;
+date &amp;lt;- &amp;quot;2020-03-17&amp;quot;
+level &amp;lt;- 10
+messages_filename &amp;lt;- paste0(asset,&amp;quot;_&amp;quot;,date,&amp;quot;_34200000_57600000_message_&amp;quot;, level,&amp;quot;.csv&amp;quot;)
+orderbook_filename &amp;lt;- paste0(asset, &amp;quot;_&amp;quot;,date,&amp;quot;_34200000_57600000_orderbook_&amp;quot;, level,&amp;quot;.csv&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s have a look at the raw message feed first.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;messages_raw &amp;lt;- read_csv(messages_filename, 
+                col_names = c(&amp;quot;ts&amp;quot;, &amp;quot;type&amp;quot;, &amp;quot;order_id&amp;quot;, &amp;quot;m_size&amp;quot;, &amp;quot;m_price&amp;quot;, 
+                              &amp;quot;direction&amp;quot;, &amp;quot;null&amp;quot;),
+                col_types = cols(ts = col_double(), 
+                                 type = col_integer(),
+                                 order_id = col_integer(),
+                                 m_size = col_double(),
+                                 m_price = col_double(),
+                                 direction = col_integer(),
+                                 null = col_skip())) %&amp;gt;% 
+  mutate(ts = as.POSIXct(ts, origin=date, tz=&amp;quot;GMT&amp;quot;), 
+         m_price = m_price / 10000)
+
+messages_raw&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 20,000 x 6
+##    ts                   type order_id m_size m_price direction
+##    &amp;lt;dttm&amp;gt;              &amp;lt;int&amp;gt;    &amp;lt;int&amp;gt;  &amp;lt;dbl&amp;gt;   &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;
+##  1 2020-03-17 09:30:00     4 24654260    230    245          1
+##  2 2020-03-17 09:30:00     3 24683304    500    245.        -1
+##  3 2020-03-17 09:30:00     3 24690848    500    245.         1
+##  4 2020-03-17 09:30:00     1 24699256    500    245.        -1
+##  5 2020-03-17 09:30:00     3 24690812    500    245.        -1
+##  6 2020-03-17 09:30:00     3 24699256    500    245.        -1
+##  7 2020-03-17 09:30:00     1 24699992    500    245.         1
+##  8 2020-03-17 09:30:00     1 24700384    500    245.         1
+##  9 2020-03-17 09:30:00     3 24700384    500    245.         1
+## 10 2020-03-17 09:30:00     1 24700516    500    245.         1
+## # ... with 19,990 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By default, &lt;code&gt;ts&lt;/code&gt; denotes the time in seconds since midnight (decimals are precise until nanosecond level) and &lt;code&gt;price&lt;/code&gt; always comes in 10.000 USD. &lt;code&gt;type&lt;/code&gt; denotes the message type: &lt;code&gt;4&lt;/code&gt;, for instance, corresponds to the execution of a visible order. The remaining variables are explained in more detail &lt;a href=&#34;https://lobsterdata.com/info/DataStructure.php&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Next, the corresponding orderbook snapshots contain &lt;code&gt;price&lt;/code&gt; and quoted &lt;code&gt;size&lt;/code&gt; for each of the &lt;code&gt;10&lt;/code&gt; levels.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook_raw &amp;lt;- read_csv(orderbook_filename,
+    col_names = paste(rep(c(&amp;quot;ask_price&amp;quot;, &amp;quot;ask_size&amp;quot;, &amp;quot;bid_price&amp;quot;, &amp;quot;bid_size&amp;quot;), level),
+                      rep(1:level, each=4), sep=&amp;quot;_&amp;quot;),
+    cols(.default = col_double())) %&amp;gt;% 
+  mutate_at(vars(contains(&amp;quot;price&amp;quot;)), ~./10000)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;putting-the-files-together&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Putting the files together&lt;/h3&gt;
+&lt;p&gt;Each message is associated with the corresponding orderbook snapshot at that point in time.
+After merging &lt;code&gt;message&lt;/code&gt; and &lt;code&gt;orderbook&lt;/code&gt; files, the entire data thus looks as follows&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook &amp;lt;- bind_cols(messages_raw, orderbook_raw) &lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;ts&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;type&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;order_id&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;m_size&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;m_price&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ask_price_1&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ask_size_1&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;bid_price_1&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;bid_size_1&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24654260&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;230&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24683304&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24690848&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24699256&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24690812&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24699256&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.11&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compute-summary-statistics&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compute summary statistics&lt;/h2&gt;
+&lt;p&gt;Next, I compute summary statistics on 20 second levels. In particular I am interested in quoted prices, spreads, and depth (the amount of tradeable units in the orderbook):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Midquote &lt;span class=&#34;math inline&#34;&gt;\(q_t = (a_t + b_t)/2\)&lt;/span&gt; (where &lt;span class=&#34;math inline&#34;&gt;\(a_t\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b_t\)&lt;/span&gt; denote the best bid and best ask)&lt;/li&gt;
+&lt;li&gt;Spread &lt;span class=&#34;math inline&#34;&gt;\(S_t= (a_t - b_t)\)&lt;/span&gt; (values below are computed in basis points relative to the concurrent midquote)&lt;/li&gt;
+&lt;li&gt;Volume is the aggretate sum of traded units of the stock. I do differentiate between hidden (&lt;code&gt;type==5&lt;/code&gt;) and visible volume.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook &amp;lt;- orderbook %&amp;gt;% mutate(midquote = ask_price_1/2 + bid_price_1/2, 
+                     spread = (ask_price_1 - bid_price_1)/midquote * 10000,
+                     volume = if_else(type ==4|type ==5, m_size, 0),
+                     hidden_volume = if_else(type ==5, m_size, 0))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As a last step, &lt;code&gt;depth&lt;/code&gt; of the orderbook denotes the number of assets that can be traded without moving the quoted price more than a given range (measured in basis points) from the concurrent midquote. The function below takes care of the slightly involved computations.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compute_depth &amp;lt;- function(df, side = &amp;quot;bid&amp;quot;, bp = 0){
+  if(side ==&amp;quot;bid&amp;quot;){
+    value_bid &amp;lt;- (1-bp/10000)*df %&amp;gt;% select(&amp;quot;bid_price_1&amp;quot;) 
+    index_bid &amp;lt;- df %&amp;gt;% select(contains(&amp;quot;bid_price&amp;quot;)) %&amp;gt;% 
+      mutate_all(function(x) {x &amp;gt;= value_bid})
+    sum_vector &amp;lt;- (df %&amp;gt;% select(contains(&amp;quot;bid_size&amp;quot;))*index_bid) %&amp;gt;% rowSums()
+  }else{
+    value_ask &amp;lt;- (1+bp/10000)*df %&amp;gt;% select(&amp;quot;ask_price_1&amp;quot;)
+    index_ask &amp;lt;- df %&amp;gt;% select(contains(&amp;quot;ask_price&amp;quot;)) %&amp;gt;% 
+      mutate_all(function(x) {x &amp;lt;= value_ask})
+    sum_vector &amp;lt;- (df %&amp;gt;% select(contains(&amp;quot;ask_size&amp;quot;))*index_ask) %&amp;gt;% rowSums()
+    
+  }
+  return(sum_vector)
+}
+
+orderbook &amp;lt;- orderbook %&amp;gt;% mutate(depth_bid = compute_depth(orderbook),
+                                  depth_ask = compute_depth(orderbook, side=&amp;quot;ask&amp;quot;),
+                                  depth_bid_5 = compute_depth(orderbook, bp = 5),
+                                  depth_ask_5 = compute_depth(orderbook, bp = 5, side=&amp;quot;ask&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Almost there! The snippet below splits the data into 20 second intervals and computes the averages of the computed summary statistics.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook_dense &amp;lt;- orderbook %&amp;gt;%
+  mutate(ts_minute = floor_date(ts, &amp;quot;20 seconds&amp;quot;)) %&amp;gt;% 
+  select(midquote:ts_minute) %&amp;gt;% 
+  group_by(ts_minute) %&amp;gt;% 
+  mutate(messages = n(),
+         volume = sum(volume),
+         hidden_volume = sum(hidden_volume)) %&amp;gt;%
+  summarise_all(mean)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here we go: during the first 100 seconds on March 17th, 20.000 messages related to the orderbook of SPY have been processed by NASDAQ. The quoted spread on average was around 3bp. On average, roughly 90.000 contracts have been traded during each 20 second slot - in other words, assets worth roughly 90 million USD have been exchanged. Quoted liquidity at the best bid and best ask seems rather small relative to the tremendous amounts of trading activity during this (very short) period of time.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;ts_minute&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;midquote&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;spread&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;volume&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;hidden_volume&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_bid&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_ask&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_bid_5&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_ask_5&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;messages&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.0332&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.010257&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;89606&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;19923&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;353.7358&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;354.1362&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1854.152&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2516.916&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5890&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.2229&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.142070&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54733&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;23716&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;190.3232&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;238.8164&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2099.857&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2041.646&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3165&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:40&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.5052&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.177630&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;53273&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18188&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;121.9574&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;182.5553&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2113.945&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2282.149&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4246&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:31:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.2010&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.488751&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;146974&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;86780&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;297.4000&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;254.3316&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1985.406&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2416.603&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4210&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:31:20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.6590&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.514445&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;26286&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6655&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;122.6870&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;115.6107&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2174.080&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2325.517&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2489&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Finally, some visualisation of the data at hand: The code below creates the figure at the beginning of the post and shows the dynamics of the traded prices (red line) and the quoted prices at the higher levels of the orderbook.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook_trades &amp;lt;- orderbook %&amp;gt;% 
+  filter(type==4|type==5) %&amp;gt;% 
+  select(ts, m_price)
+
+orderbook_quotes &amp;lt;- orderbook %&amp;gt;% 
+  mutate(id = row_number()) %&amp;gt;%
+  select(ts, id, matches(&amp;quot;bid|ask&amp;quot;)) %&amp;gt;% 
+  gather(level, price, -ts, -id) %&amp;gt;%
+  separate(level, into=c(&amp;quot;side&amp;quot;,&amp;quot;variable&amp;quot;,&amp;quot;level&amp;quot;), sep=&amp;quot;_&amp;quot;) %&amp;gt;%
+  mutate(level = as.numeric(level))  %&amp;gt;% 
+  spread(variable, price)
+
+p1 &amp;lt;- ggplot() + 
+  theme_bw() +
+  geom_point(data = orderbook_quotes, aes(x=ts, y=price, color=level, size = size/max(size)), alpha = 0.1)+
+  geom_line(data = orderbook_trades, aes(x=ts, y=m_price), color=&amp;#39;red&amp;#39;) + 
+  labs(title=&amp;quot;SPY: Orderbook Dynamics&amp;quot;,
+       y=&amp;quot;Price&amp;quot;,
+       x=&amp;quot;&amp;quot;) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position =&amp;quot;none&amp;quot;) +
+  scale_y_continuous()&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
+      <link>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
+      <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
+      <description>&lt;p&gt;This paper replaces an earlier draft titled &amp;ldquo;Limits to Arbitrage
+in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Large Scale Portfolio Optimization under Transaction Costs and Model Uncertainty</title>
+      <link>/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
+      <pubDate>Mon, 01 Jul 2019 00:00:00 +0000</pubDate>
+      <guid>/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

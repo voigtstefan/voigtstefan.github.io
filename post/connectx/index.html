@@ -1,0 +1,1326 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Bellman Equation outside of Finance. A short report on my first Kaggle Competition">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/connectx/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="rgb(237, 65, 77)">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+    
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cutive+Mono%7CLora:400,700%7CRoboto:400,700&display=swap">
+    
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/connectx/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Stefan Voigt">
+  <meta property="og:url" content="/post/connectx/">
+  <meta property="og:title" content="Connect Four - Deep Reinforcement Learning | Stefan Voigt">
+  <meta property="og:description" content="Bellman Equation outside of Finance. A short report on my first Kaggle Competition"><meta property="og:image" content="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png">
+  <meta property="twitter:image" content="/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2020-04-01T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-04-14T10:44:36&#43;01:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/connectx/"
+  },
+  "headline": "Connect Four - Deep Reinforcement Learning",
+  
+  "datePublished": "2020-04-01T00:00:00Z",
+  "dateModified": "2020-04-14T10:44:36+01:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Stefan Voigt"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Stefan Voigt",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_192x192_fill_lanczos_center_2.png"
+    }
+  },
+  "description": "Bellman Equation outside of Finance. A short report on my first Kaggle Competition"
+}
+</script>
+
+  
+
+  
+
+
+  
+  
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.js" integrity="sha256-5VhCqFam2Cn+yjw61zbBNrbHVJ6SRydPeKopYlngbiQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.css" integrity="sha256-zQ0LblD/Af8vOppw18+2anxsuaz3pWYyVWi+bTvTH8Q=" crossorigin="anonymous">
+  
+  <script>
+  window.addEventListener("load", function(){
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "rgb(237, 65, 77)",
+          "text": "#fff"
+        },
+        "button": {
+          "background": "#fff",
+          "text": "rgb(237, 65, 77)"
+        }
+      },
+      "theme": "classic",
+      "content": {
+        "message": "This website uses cookies to ensure you get the best experience on our website.",
+        "dismiss": "Got it!",
+        "link": "Learn more",
+        "href": "https://www.cookiesandyou.com"
+      }
+    })});
+  </script>
+
+
+
+  
+
+
+
+
+
+  <title>Connect Four - Deep Reinforcement Learning | Stefan Voigt</title>
+
+</head>
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Stefan Voigt</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Stefan Voigt</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#publications"><span>Publications</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#teaching"><span>Teaching</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/files/1_Voigt_CV.pdf"><span>CV</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Connect Four - Deep Reinforcement Learning</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+  
+  
+  <div>
+    
+
+  
+  <span >Stefan Voigt</span>
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    Apr 14, 2020
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    8 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>I recently stumbled uppon 
+<a href="https://www.kaggle.com/c/connectx" target="_blank" rel="noopener">the amazing Connect Kaggle Competition</a> and I tried to improve my humble knowledge on reinforcement learning by participating in this challenge.</p>
+<h2 id="the-task">The task</h2>
+<p>Very simple: Write an agent that plays <strong>
+<a href="https://en.wikipedia.org/wiki/Connect_Four" target="_blank" rel="noopener">Connect Four</a></strong> against competing algorithms. 
+<img src="/post/2020-03-27-connectx_files/connectx.PNG" alt=""></p>
+<h3 id="my-way-to-tackle-it-deep-q-learning">My way to tackle it: &ldquo;Deep&rdquo; Q-Learning</h3>
+<p>Sure, I could write some deterministic code on how to proceed in the game but what I actually implement is a seemingly brute-force method: Let the agent play the game over and over again and learn the rules the hard way. More specifically, the agents receives information on the current <em>observation</em> (the current state of the board) and then has to take an <em>action</em> (which slot to choose to add a coin). After that, nature responses with a new state and potentially yields a reward (if the game is won) or a penalty (if the game is lost or if the agent chooses an action that is not valid - such as putting a coin into an already full slot).</p>
+<p><img src="/post/2020-03-27-connectx_files/reinforcement_learning.png" alt=""></p>
+<p>How should the agent decide on her <em>action</em>? In finance, the concept of dynamic programming, more specifically, the Bellman-equation, is well-known: Aim at actions that yield the highest expected reward. You can do so, by value each <em>(action, state)</em> pair with respect to the immediate rewards and the transition into the <em>next_state</em>. More specifically, you value an <em>action</em> $a$ given the current <em>state</em> $s_t$ as</p>
+<p>$$Q(a, s_t) = r + \gamma\max\limits_{a&rsquo;}\hat{Q}(a&rsquo;, s_{t+1})$$</p>
+<p>where $\gamma$ is a discount factor and $\hat{Q}$ is the (predicted) value of the next state.
+If we&rsquo;d play a simpler game, we could try to store all possible <em>(action, state)</em> pairs and compute the optimal action. However, <em>Connect Four</em> in its basic fashion has 
+<a href="https://math.stackexchange.com/questions/301106/how-many-different-game-situations-has-connect-four" target="_blank" rel="noopener">4531985219092</a> different possible states, so good luck with that aproach (which would be called Q-Learning, by the way).</p>
+<p>What I do instead, is approximating this function using a Neural network, simply because I have always wanted to implement something like this. The python kernel below summarises my implementation and tremendously benefits from 
+<a href="https://www.kaggle.com/phunghieu/connectx-with-q-learning" target="_blank" rel="noopener">Hieu Phungs work on Q-Learning</a> and 
+<a href="https://keon.github.io/deep-q-learning/" target="_blank" rel="noopener">Keon Kims blog</a>.</p>
+<h2 id="initialization">Initialization</h2>
+<p>Below packages are setting up the environment. Kaggle provides an entire framework to test your agent. <code>keras</code> is using the <code>TensorFlow</code> backend to handle the neural network.</p>
+<pre><code class="language-python">import gym
+import numpy as np
+from math import exp, log
+#import random
+from random import choice, uniform
+from collections import deque
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam
+from kaggle_environments import evaluate, make
+</code></pre>
+<pre><code>Using TensorFlow backend.
+</code></pre>
+<h2 id="define-environment">Define Environment</h2>
+<p>The ConnectX environment below allows to play around with the setup in a clean &lsquo;gym&rsquo; style which makes it very easy to interact with current states. In order to train my agent properly, the <code>switch_side</code> and <code>switch_trainer</code> functions are called whenever we start a new game. Therefore, the agent (hopefully) learns to play on both sides of the board against the provided <code>negamax</code> and the <code>random</code> opponent (<code>random</code> just drops coins into arbitrarily chosen slots). For the purpose of illustrating the code, I switch the <code>negamax</code> function of, however.</p>
+<pre><code class="language-python">class ConnectX(gym.Env):
+    
+    def __init__(self, switch_prob=0.5):
+        self.env = make('connectx', debug=True)
+        self.pair = [None, 'random']
+        self.trainer = self.env.train(self.pair)
+        self.switch_prob = switch_prob
+        config = self.env.configuration
+        self.action_space = gym.spaces.Discrete(config.columns)
+        self.observation_space = gym.spaces.Box(low=0, high=2, shape=(config.rows,config.columns,1), dtype=np.int)
+
+    def switch_side(self):
+        self.pair = self.pair[::-1]
+        self.trainer = self.env.train(self.pair)
+    
+    def switch_trainer(self):
+        current_trainer_random = 'random' in self.pair 
+        if current_trainer_random:
+            self.pair = [None, 'negamax']
+        else:
+            self.pair = [None, 'random']
+        self.trainer = self.env.train(self.pair)
+    
+    def step(self, action):
+        return self.trainer.step(action)
+    
+    def reset(self):
+        if random.uniform(0, 1) &lt; self.switch_prob: # switch side
+            self.switch_side()
+        #if random.uniform(0, 1) &lt; self.switch_prob: # switch trainer
+        #    self.switch_trainer()        
+        return self.trainer.reset()
+</code></pre>
+<h2 id="deep-learning-agent">Deep Learning Agent</h2>
+<p>I am really not an expert in neural nets. Thus, all I do is playing around a bit. The magic in defining the agent as below is happening in the <code>replay</code> function: After gathering some experience, a neural network is trained to make sense of the <code>state</code>, <code>action</code> and <code>reward</code> relationship. The <code>target</code> is set such that the network aims at minimizing the loss between predicting the reward of the <code>next_state</code> and the realized reward.</p>
+<pre><code class="language-python"># Deep Q-learning Agent
+class DQNAgent:
+
+    def __init__(self, state_size, action_size, episodes):
+        self.state_size = state_size
+        self.action_size = action_size
+        self.memory = deque(maxlen=500)
+        self.gamma = 0.9   # discount rate
+        self.epsilon = 0.10  # initial exploration rate
+        self.epsilon_min = 0.01
+        self.epsilon_decay = exp((log(self.epsilon_min) - log(self.epsilon))/(0.8*episodes)) # reaches epsilon_min after 80% of iterations
+        self.model = self._build_model()
+    
+    def _build_model(self):
+        # Neural Net for Deep-Q learning Model
+        model = Sequential()
+        model.add(Dense(20, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(50, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
+        model.compile(loss='mse',
+                      optimizer=Adam(lr = 0.00001))
+        return model
+    
+    def memorize(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
+    
+    def act(self, state):
+        if np.random.rand() &lt;= self.epsilon: # Exploration
+            return choice([c for c in range(self.action_size) if state[:,c] == 0])
+            #when exploring, I allow for &quot;wrong&quot; moves to give the agent a chance 
+            #to experience the penalty of choosing full columns
+            #return choice([c for c in range(self.action_size)])
+        act_values = self.model.predict(state) # Exploitation
+        action = np.argmax(act_values[0]) 
+        return action
+    
+    def replay(self, batch_size):
+        minibatch = random.sample(self.memory, batch_size)
+        for state, action, reward, next_state, done in minibatch:
+            target = reward
+            if not done:
+                target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+            target_f = self.model.predict(state)
+            target_f[0][action] = target
+            self.model.fit(state, target_f, epochs=1, verbose=0)
+        if self.epsilon &gt; self.epsilon_min:
+            self.epsilon *= self.epsilon_decay
+
+    def load(self, name):
+        self.model.load_weights(name)
+    
+    def save(self, name):
+        self.model.save_weights(name)
+</code></pre>
+<h2 id="train-the-agent">Train the agent</h2>
+<p>Training is nothing as iteratively playing against the trainer, memorizing what happened and updating the neural net weights after each iteration. Notable thing here is that I let the agent also learn what a valid move is the hard way (a move is invalid if the agent chooses a column which is already full). After an invalid move the game is over (<code>done = True</code>) and I penalize invalid actions hard.</p>
+<pre><code class="language-python"># initialize gym environment and the agent
+env = ConnectX(switch_prob = 0.5)
+state_size = env.observation_space.shape[1]*env.observation_space.shape[0]
+action_size = env.observation_space.shape[1]
+episodes = 40000
+agent = DQNAgent(state_size, action_size, episodes)
+agent.load(&quot;./connectX-weights_deep.h5&quot;) # load prelearned weights
+batch_size = 40 # Don't know if this number makes sense
+
+# Monitoring devices
+all_total_rewards = np.empty(episodes)
+all_avg_rewards = np.empty(episodes)
+
+# Iterate the game
+for e in range(episodes):
+    # reset state in the beginning of each game
+    done = False
+    state = env.reset()
+    total_rewards = 0
+    while not done:
+        # Decide action
+        action = int(agent.act(np.array([state.board])))
+        next_state, reward, done, _ = env.step(action)
+        if not done:
+            reward = 0.0/42 # default: reward of 0.5 if not done/ 1 if win/ 0 if lost
+        if done:
+            if reward == 1: # Won
+                reward = 1
+            elif reward == 0: # Lost
+                reward = -1
+            else: # Draw
+                reward = 0
+        if state.board[action]!=0: # invalid move: hard penalization
+            reward = -10
+        agent.memorize(np.array([state.board]), action, reward, np.array([next_state.board]), done)
+        # make next_state the new current state for the next frame.
+        state = next_state
+        total_rewards += reward
+    if len(agent.memory) &gt; batch_size:
+        agent.replay(batch_size)
+        all_total_rewards[e] = total_rewards
+        avg_reward = all_total_rewards[max(0, e - 100):e].mean()
+        all_avg_rewards[e] = avg_reward
+        if e % 100 == 0 :
+            agent.save(&quot;./connectX-weights_deep.h5&quot;)
+            print(&quot;episode: {}/{}, epsilon: {:.2f}, average: {:.2f}&quot;.format(e, episodes, agent.epsilon, avg_reward))
+</code></pre>
+<p>After <em>a lot</em> of training (millions of iterations with a prescheduled decreasing learning rate), the agent seems to have learned quite a bit: although I do not prevent the agent from choosing invalid actions, after some time such events basically do not happen anymore. Further, the agent starts winning against the <code>random</code> opponent with a fast increasing frequency.</p>
+<pre><code>episode: 39100/40000, epsilon: 0.01, average: 0.66
+Invalid Action: Invalid column: 1
+episode: 39200/40000, epsilon: 0.01, average: 0.65
+episode: 39300/40000, epsilon: 0.01, average: 0.64
+episode: 39400/40000, epsilon: 0.01, average: 0.78
+episode: 39500/40000, epsilon: 0.01, average: 0.70
+episode: 39600/40000, epsilon: 0.01, average: 0.68
+episode: 39700/40000, epsilon: 0.01, average: 0.72
+episode: 39800/40000, epsilon: 0.01, average: 0.68
+episode: 39900/40000, epsilon: 0.01, average: 0.64
+</code></pre>
+<h2 id="did-the-agent-learn-anything">Did the agent learn anything?</h2>
+<p>The learned weights are used to compute <code>actions</code> of the agent during the games. The figure below shows the average rewards gained by the trained agent (including the penalty for chosing invalid actions).</p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+plt.plot(all_avg_rewards)
+plt.xlabel('Episode')
+plt.ylabel('Avg rewards (100)')
+plt.show()
+</code></pre>
+<p><img src="/post/2020-03-27-connectx_files/output_10_0.png" alt=""></p>
+<p>Finally, the real-life test: Submission of the agent to Kaggle. The procedure is somewhat cumbersome procedure because Kaggle does not allow <code>keras</code> modules for submission but the below procedure seems to work</p>
+<pre><code class="language-python">model = Sequential()
+model = Sequential()
+model.add(Dense(20, input_dim=state_size, activation='relu'))
+model.add(Dense(50, activation='relu'))
+model.add(Dense(action_size, activation='linear'))
+model.load_weights('connectX-weights_deep.h5')
+
+layers = []
+
+# Get all layers' weights
+for i in range(3):
+    weights, biases = model.layers[i].get_weights()
+    layers.extend([weights, biases])
+
+fc_layers = list(map(
+    lambda x: str(list(np.round(x, 8))) \
+        .replace('array(', '').replace(')', '') \
+        .replace(' ', '') \
+        .replace('\n', '') \
+        .replace(',dtype=float32',''),
+    layers
+))
+fc_layers = np.reshape(fc_layers, (-1, 2))
+
+# Create the agent
+my_agent = '''def my_agent(observation, configuration):
+    import numpy as np
+
+'''
+# Write hidden layers
+for i, (w, b) in enumerate(fc_layers[:-1]):
+    my_agent += '    hl{}_w = np.array({}, dtype=np.float32)\n'.format(i+1, w)
+    my_agent += '    hl{}_b = np.array({}, dtype=np.float32)\n'.format(i+1, b)
+
+my_agent += '    ol_w = np.array({}, dtype=np.float32)\n'.format(fc_layers[-1][0])
+my_agent += '    ol_b = np.array({}, dtype=np.float32)\n'.format(fc_layers[-1][1])
+my_agent += '''
+    state = observation.board[:]
+#    state.append(observation.mark)
+    out = np.array(state, dtype=np.float32)
+'''
+
+for i in range(len(fc_layers[:-1])):
+    my_agent += '    out = np.matmul(out, hl{0}_w) + hl{0}_b\n'.format(i+1)
+    my_agent += '    out = 1/(1 + np.exp(-out))\n' # Sigmoid function
+
+my_agent += '    out = np.matmul(out, ol_w) + ol_b\n'
+my_agent += '''
+    for i in range(configuration.columns):
+        if observation.board[i] != 0:
+            out[i] = -1e7
+
+    return int(np.argmax(out))
+    '''
+
+with open('submission.py', 'w') as f:
+    f.write(my_agent)
+</code></pre>
+<h2 id="yes-she-did">Yes, she did!</h2>
+<pre><code class="language-python">from submission import my_agent
+
+env = make(&quot;connectx&quot;, debug=True)
+env.run([my_agent, my_agent])
+print(&quot;Success!&quot; if env.state[0].status == env.state[1].status == &quot;DONE&quot; else &quot;Failed...&quot;)
+
+def mean_reward(rewards):
+    return sum(r[0] for r in rewards) / sum(r[0] + r[1] for r in rewards)
+
+# Run multiple episodes to estimate agent's performance.
+print(&quot;My Agent vs. Random Agent:&quot;, mean_reward(evaluate(&quot;connectx&quot;, [my_agent, &quot;random&quot;], num_episodes=50)))
+print(&quot;Random Agent vs. My Agent:&quot;, mean_reward(evaluate(&quot;connectx&quot;, [&quot;random&quot;, my_agent], num_episodes=50)))
+#print(&quot;My Agent vs. Negamax Agent:&quot;, mean_reward(evaluate(&quot;connectx&quot;, [my_agent, &quot;negamax&quot;], num_episodes=10)))
+#print(&quot;Negamax Agent vs. My Agent:&quot;, mean_reward(evaluate(&quot;connectx&quot;, [&quot;negamax&quot;, my_agent], num_episodes=10)))
+</code></pre>
+<p>So it seems that Deep-Q-Learning helped: by just playing against an random agent, the neural network was trained to win the game - even without knowing the rules in advance!</p>
+<pre><code>My Agent vs. Random Agent: 0.88
+Random Agent vs. My Agent: 0.24
+</code></pre>
+
+    </div>
+
+    
+
+
+
+
+
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/connectx/&amp;text=Connect%20Four%20-%20Deep%20Reinforcement%20Learning" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/connectx/&amp;t=Connect%20Four%20-%20Deep%20Reinforcement%20Learning" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Connect%20Four%20-%20Deep%20Reinforcement%20Learning&amp;body=/post/connectx/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/connectx/&amp;title=Connect%20Four%20-%20Deep%20Reinforcement%20Learning" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=Connect%20Four%20-%20Deep%20Reinforcement%20Learning%20/post/connectx/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/connectx/&amp;title=Connect%20Four%20-%20Deep%20Reinforcement%20Learning" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = false;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.66c553246b0f279a03be6e5597f72b52.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    
+    Published with
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic Website Builder</a>
+    
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>3 | Stefan Voigt</title>
+    <link>/publication-type/3/</link>
+      <atom:link href="/publication-type/3/index.xml" rel="self" type="application/rss+xml" />
+    <description>3</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 19 May 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png</url>
+      <title>3</title>
+      <link>/publication-type/3/</link>
+    </image>
+    
+    <item>
+      <title>Liquidity and Price Informativeness in Blockchain-Based Markets</title>
+      <link>/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</link>
+      <pubDate>Tue, 19 May 2020 00:00:00 +0000</pubDate>
+      <guid>/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
+      <link>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
+      <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
+      <description>&lt;p&gt;This paper replaces an earlier draft titled &amp;ldquo;Limits to Arbitrage
+in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
