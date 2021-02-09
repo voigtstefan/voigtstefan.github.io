@@ -691,5 +691,13 @@ p1 &amp;lt;- ggplot() +
 </description>
     </item>
     
+    <item>
+      <title>LobsteR - NASDAQ under a &#34;tidy&#34; Microscope</title>
+      <link>https://voigtstefan.me/post/lobster-1/</link>
+      <pubDate>Wed, 25 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/post/lobster-1/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>
