@@ -1,0 +1,180 @@
+---
+title: LobsteR - NASDAQ under a "tidy" Microscope
+author: Stefan Voigt
+date: '2020-03-25'
+slug: lobster-1
+categories: []
+tags: []
+subtitle: ''
+summary: 'A short  series of posts on handling high-frequency data from Lobster and R'
+authors: [Stefan Voigt]
+lastmod: '2020-03-27T09:21:36+01:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '../..Projects/SPY_Investigation/Example_Files')
+```
+
+During my PhD studies, I have been working with high-frequency trading data provided by [Lobster](www.lobsterdata.com) a lot for some of my [research projects](../../publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/).  
+In this short series of posts, I want share some of my code and routines to efficiently handly the extremely large amounts of data that go through NASDAQs servers on a daily basis. In fact, if you look at the figure below, there is plenty to explore: during less than 2 minutes on March 17th, 2020, thousands of trades have been executed for SPY, a large ETF. The red line shows the traded prices during that period and the blue shaded areas show the dynamics of the orderbook. The darker the areas, the *more* liquidity (measured as size of the order book levels).  
+
+![](public/post/2020-03-25-lobster-1_files/orderbook_dynamic.png)
+
+First, I provide some snippets to read-in Lobster files and to compute some potentially interesting statistics. [In a second post](../../post/lobster-large-scale-liquidity-analysis), I illustrate long-run characteristics of the orderbook dynamics and I'll finally focus some really recent events: the days since the outbreak of COVID19 have been extremely bumpy for [SPY](https://en.wikipedia.org/wiki/SPDR_S%26P_500_Trust_ETF), the largest ETF in the world and it is amazing to see, how liquidity supply changed during these rough days. 
+
+## Handling Lobster Data
+
+[Lobster](www.lobsterdata.com) is an online limit order book data tool to provide easy-to-use, high-quality limit order book data for the entire universe of NASDAQ traded stocks. I requested some of the data based on their online interface and stored it before running the code below. 
+The actual data which I will use for the next post is much larger. I downloaded **all** trading messages for ticker SPY (order submissions, cancellations, trades, ...) that went through NASDAQ since July, 27th 2007 until March, 25th, 2020. The files contain the entire orderbooks until level 10.
+
+### First steps
+I work in **R** with message level data from Lobster in a *tidy* and (hopefully) efficient way. 
+
+```{r packages, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+As an example, I illustrate the computations for a tiny glimpse of March 17th, 2020. Lobster files always come with the same naming convention `ticker_date_34200000_57600000_filetype_level.csv`, whereas `filetype` either denotes `message` or the corresponding `orderbook` snapshots.   
+```{r data}
+asset <- "SPY"
+date <- "2020-03-17"
+level <- 10
+messages_filename <- paste0(asset,"_",date,"_34200000_57600000_message_", level,".csv")
+orderbook_filename <- paste0(asset, "_",date,"_34200000_57600000_orderbook_", level,".csv")
+```
+Let's have a look at the raw message feed first. 
+```{r messages}
+messages_raw <- read_csv(messages_filename, 
+                col_names = c("ts", "type", "order_id", "m_size", "m_price", 
+                              "direction", "null"),
+                col_types = cols(ts = col_double(), 
+                                 type = col_integer(),
+                                 order_id = col_integer(),
+                                 m_size = col_double(),
+                                 m_price = col_double(),
+                                 direction = col_integer(),
+                                 null = col_skip())) %>% 
+  mutate(ts = as.POSIXct(ts, origin=date, tz="GMT"), 
+         m_price = m_price / 10000)
+
+messages_raw
+```
+
+By default, `ts` denotes the time in seconds since midnight (decimals are precise until nanosecond level) and `price` always comes in 10.000 USD. `type` denotes the message type: `4`, for instance, corresponds to the execution of a visible order. The remaining variables are explained in more detail [here](https://lobsterdata.com/info/DataStructure.php).  
+
+Next, the corresponding orderbook snapshots contain `price` and quoted `size` for each of the `10` levels. 
+
+```{r orderbooks} 
+orderbook_raw <- read_csv(orderbook_filename,
+    col_names = paste(rep(c("ask_price", "ask_size", "bid_price", "bid_size"), level),
+                      rep(1:level, each=4), sep="_"),
+    cols(.default = col_double())) %>% 
+  mutate_at(vars(contains("price")), ~./10000)
+
+```
+### Putting the files together
+
+Each message is associated with the corresponding orderbook snapshot at that point in time. 
+After merging `message` and `orderbook` files, the entire data thus looks as follows
+
+```{r merge}
+orderbook <- bind_cols(messages_raw, orderbook_raw) 
+```
+
+```{r orderbook_summary, echo=FALSE} 
+orderbook %>% select(c(ts:ask_size_1, bid_price_1, bid_size_1),-direction)%>%head%>%knitr::kable()
+```
+
+## Compute summary statistics 
+
+Next, I compute summary statistics on 20 second levels. In particular I am interested in quoted prices, spreads, and depth (the amount of tradeable units in the orderbook):
+
+- Midquote $q_t = (a_t + b_t)/2$ (where $a_t$ and $b_t$ denote the best bid and best ask)
+- Spread $S_t= (a_t - b_t)$ (values below are computed in basis points relative to the concurrent midquote)
+- Volume is the aggretate sum of traded units of the stock. I do differentiate between hidden (`type==5`) and visible volume.
+
+```{r summaries}
+
+orderbook <- orderbook %>% mutate(midquote = ask_price_1/2 + bid_price_1/2, 
+                     spread = (ask_price_1 - bid_price_1)/midquote * 10000,
+                     volume = if_else(type ==4|type ==5, m_size, 0),
+                     hidden_volume = if_else(type ==5, m_size, 0))
+```
+
+As a last step, `depth` of the orderbook denotes the number of assets that can be traded without moving the quoted price more than a given range (measured in basis points) from the concurrent midquote. The function below takes care of the slightly involved computations.
+```{r depth}
+
+compute_depth <- function(df, side = "bid", bp = 0){
+  if(side =="bid"){
+    value_bid <- (1-bp/10000)*df %>% select("bid_price_1") 
+    index_bid <- df %>% select(contains("bid_price")) %>% 
+      mutate_all(function(x) {x >= value_bid})
+    sum_vector <- (df %>% select(contains("bid_size"))*index_bid) %>% rowSums()
+  }else{
+    value_ask <- (1+bp/10000)*df %>% select("ask_price_1")
+    index_ask <- df %>% select(contains("ask_price")) %>% 
+      mutate_all(function(x) {x <= value_ask})
+    sum_vector <- (df %>% select(contains("ask_size"))*index_ask) %>% rowSums()
+    
+  }
+  return(sum_vector)
+}
+
+orderbook <- orderbook %>% mutate(depth_bid = compute_depth(orderbook),
+                                  depth_ask = compute_depth(orderbook, side="ask"),
+                                  depth_bid_5 = compute_depth(orderbook, bp = 5),
+                                  depth_ask_5 = compute_depth(orderbook, bp = 5, side="ask"))
+
+```
+
+Almost there! The snippet below splits the data into 20 second intervals and computes the averages of the computed summary statistics. 
+```{r nesting}
+orderbook_dense <- orderbook %>%
+  mutate(ts_minute = floor_date(ts, "20 seconds")) %>% 
+  select(midquote:ts_minute) %>% 
+  group_by(ts_minute) %>% 
+  mutate(messages = n(),
+         volume = sum(volume),
+         hidden_volume = sum(hidden_volume)) %>%
+  summarise_all(mean)
+```
+Here we go: during the first 100 seconds on March 17th, 20.000 messages related to the orderbook of SPY have been processed by NASDAQ. The quoted spread on average was around 3bp. On average, roughly 90.000 contracts have been traded during each 20 second slot - in other words, assets worth roughly 90 million USD have been exchanged. Quoted liquidity at the best bid and best ask seems rather small relative to the tremendous amounts of trading activity during this (very short) period of time. 
+
+```{r nesting_output, echo = FALSE}
+ orderbook_dense %>%knitr::kable()
+```
+
+Finally, some visualisation of the data at hand: The code below creates the figure at the beginning of the post and shows the dynamics of the traded prices (red line) and the quoted prices at the higher levels of the orderbook.
+```{r visualize_output, eval = FALSE}
+orderbook_trades <- orderbook %>% 
+  filter(type==4|type==5) %>% 
+  select(ts, m_price)
+
+orderbook_quotes <- orderbook %>% 
+  mutate(id = row_number()) %>%
+  select(ts, id, matches("bid|ask")) %>% 
+  gather(level, price, -ts, -id) %>%
+  separate(level, into=c("side","variable","level"), sep="_") %>%
+  mutate(level = as.numeric(level))  %>% 
+  spread(variable, price)
+
+p1 <- ggplot() + 
+  theme_bw() +
+  geom_point(data = orderbook_quotes, aes(x=ts, y=price, color=level, size = size/max(size)), alpha = 0.1)+
+  geom_line(data = orderbook_trades, aes(x=ts, y=m_price), color='red') + 
+  labs(title="SPY: Orderbook Dynamics",
+       y="Price",
+       x="") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position ="none") +
+  scale_y_continuous()
+```

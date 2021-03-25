@@ -7,7 +7,7 @@
     <description>Posts</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Wed, 01 Apr 2020 00:00:00 +0000</lastBuildDate>
     <image>
-      <url>/images/icon_hu87fd820f9c602e46bac9a6dd1500e016_118780_512x512_fill_lanczos_center_2.png</url>
+      <url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
@@ -384,6 +384,321 @@ Shina App Iframe
 &lt;/title&gt;
 &lt;iframe id=&#34;intradata&#34; src=&#34; https://voigtstefan.shinyapps.io/bin_data/&#34; style=&#34;border:none; width:100%; height:850px&#34; frameborder=&#34;0&#34;&gt;
 &lt;/iframe&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>LobsteR - NASDAQ under a &#34;tidy&#34; Microscope</title>
+      <link>/post/lobster-1/</link>
+      <pubDate>Wed, 25 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>/post/lobster-1/</guid>
+      <description>
+
+
+&lt;p&gt;During my PhD studies, I have been working with high-frequency trading data provided by &lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt; a lot for some of my &lt;a href=&#34;../../publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/&#34;&gt;research projects&lt;/a&gt;.&lt;br /&gt;
+In this short series of posts, I want share some of my code and routines to efficiently handle the extremely large amounts of data that go through NASDAQs servers on a daily basis. In fact, if you look at the figure below, there is plenty to explore: during less than 2 minutes on March 17th, 2020, thousands of trades have been executed for SPY, a large ETF. The red line shows the traded prices during that period and the blue shaded areas show the dynamics of the orderbook. The darker the areas, the &lt;em&gt;more&lt;/em&gt; liquidity (measured as size of the order book levels).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../orderbook_dynamic.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;First, I provide some snippets to read-in Lobster files and to compute some potentially interesting statistics. &lt;a href=&#34;../../post/lobster-large-scale-liquidity-analysis&#34;&gt;In a second post&lt;/a&gt;, I illustrate long-run characteristics of the orderbook dynamics and I’ll finally focus some really recent events: the days since the outbreak of COVID19 have been extremely bumpy for &lt;a href=&#34;https://en.wikipedia.org/wiki/SPDR_S%26P_500_Trust_ETF&#34;&gt;SPY&lt;/a&gt;, the largest ETF in the world and it is amazing to see, how liquidity supply changed during these rough days.&lt;/p&gt;
+&lt;div id=&#34;handling-lobster-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Handling Lobster Data&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt; is an online limit order book data tool to provide easy-to-use, high-quality limit order book data for the entire universe of NASDAQ traded stocks. I requested some of the data based on their online interface and stored it before running the code below.
+The actual data which I will use for the next post is much larger. I downloaded &lt;strong&gt;all&lt;/strong&gt; trading messages for ticker SPY (order submissions, cancellations, trades, …) that went through NASDAQ since July, 27th 2007 until March, 25th, 2020. The files contain the entire orderbooks until level 10.&lt;/p&gt;
+&lt;div id=&#34;first-steps&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;First steps&lt;/h3&gt;
+&lt;p&gt;I work in &lt;strong&gt;R&lt;/strong&gt; with message level data from Lobster in a &lt;em&gt;tidy&lt;/em&gt; and (hopefully) efficient way.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+library(lubridate)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As an example, I illustrate the computations for a tiny glimpse of March 17th, 2020. Lobster files always come with the same naming convention &lt;code&gt;ticker_date_34200000_57600000_filetype_level.csv&lt;/code&gt;, whereas &lt;code&gt;filetype&lt;/code&gt; either denotes &lt;code&gt;message&lt;/code&gt; or the corresponding &lt;code&gt;orderbook&lt;/code&gt; snapshots.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;asset &amp;lt;- &amp;quot;SPY&amp;quot;
+date &amp;lt;- &amp;quot;2020-03-17&amp;quot;
+level &amp;lt;- 10
+messages_filename &amp;lt;- paste0(asset,&amp;quot;_&amp;quot;,date,&amp;quot;_34200000_57600000_message_&amp;quot;, level,&amp;quot;.csv&amp;quot;)
+orderbook_filename &amp;lt;- paste0(asset, &amp;quot;_&amp;quot;,date,&amp;quot;_34200000_57600000_orderbook_&amp;quot;, level,&amp;quot;.csv&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s have a look at the raw message feed first.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;messages_raw &amp;lt;- read_csv(messages_filename, 
+                col_names = c(&amp;quot;ts&amp;quot;, &amp;quot;type&amp;quot;, &amp;quot;order_id&amp;quot;, &amp;quot;m_size&amp;quot;, &amp;quot;m_price&amp;quot;, 
+                              &amp;quot;direction&amp;quot;, &amp;quot;null&amp;quot;),
+                col_types = cols(ts = col_double(), 
+                                 type = col_integer(),
+                                 order_id = col_integer(),
+                                 m_size = col_double(),
+                                 m_price = col_double(),
+                                 direction = col_integer(),
+                                 null = col_skip())) %&amp;gt;% 
+  mutate(ts = as.POSIXct(ts, origin=date, tz=&amp;quot;GMT&amp;quot;), 
+         m_price = m_price / 10000)
+
+messages_raw&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 20,000 x 6
+##    ts                   type order_id m_size m_price direction
+##    &amp;lt;dttm&amp;gt;              &amp;lt;int&amp;gt;    &amp;lt;int&amp;gt;  &amp;lt;dbl&amp;gt;   &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;
+##  1 2020-03-17 09:30:00     4 24654260    230    245          1
+##  2 2020-03-17 09:30:00     3 24683304    500    245.        -1
+##  3 2020-03-17 09:30:00     3 24690848    500    245.         1
+##  4 2020-03-17 09:30:00     1 24699256    500    245.        -1
+##  5 2020-03-17 09:30:00     3 24690812    500    245.        -1
+##  6 2020-03-17 09:30:00     3 24699256    500    245.        -1
+##  7 2020-03-17 09:30:00     1 24699992    500    245.         1
+##  8 2020-03-17 09:30:00     1 24700384    500    245.         1
+##  9 2020-03-17 09:30:00     3 24700384    500    245.         1
+## 10 2020-03-17 09:30:00     1 24700516    500    245.         1
+## # ... with 19,990 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By default, &lt;code&gt;ts&lt;/code&gt; denotes the time in seconds since midnight (decimals are precise until nanosecond level) and &lt;code&gt;price&lt;/code&gt; always comes in 10.000 USD. &lt;code&gt;type&lt;/code&gt; denotes the message type: &lt;code&gt;4&lt;/code&gt;, for instance, corresponds to the execution of a visible order. The remaining variables are explained in more detail &lt;a href=&#34;https://lobsterdata.com/info/DataStructure.php&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Next, the corresponding orderbook snapshots contain &lt;code&gt;price&lt;/code&gt; and quoted &lt;code&gt;size&lt;/code&gt; for each of the &lt;code&gt;10&lt;/code&gt; levels.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook_raw &amp;lt;- read_csv(orderbook_filename,
+    col_names = paste(rep(c(&amp;quot;ask_price&amp;quot;, &amp;quot;ask_size&amp;quot;, &amp;quot;bid_price&amp;quot;, &amp;quot;bid_size&amp;quot;), level),
+                      rep(1:level, each=4), sep=&amp;quot;_&amp;quot;),
+    cols(.default = col_double())) %&amp;gt;% 
+  mutate_at(vars(contains(&amp;quot;price&amp;quot;)), ~./10000)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;putting-the-files-together&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Putting the files together&lt;/h3&gt;
+&lt;p&gt;Each message is associated with the corresponding orderbook snapshot at that point in time.
+After merging &lt;code&gt;message&lt;/code&gt; and &lt;code&gt;orderbook&lt;/code&gt; files, the entire data thus looks as follows&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook &amp;lt;- bind_cols(messages_raw, orderbook_raw) &lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;ts&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;type&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;order_id&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;m_size&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;m_price&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ask_price_1&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ask_size_1&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;bid_price_1&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;bid_size_1&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24654260&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;230&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24683304&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24690848&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24699256&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24690812&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24699256&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.11&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.88&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compute-summary-statistics&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compute summary statistics&lt;/h2&gt;
+&lt;p&gt;Next, I compute summary statistics on 20 second levels. In particular I am interested in quoted prices, spreads, and depth (the amount of tradeable units in the orderbook):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Midquote &lt;span class=&#34;math inline&#34;&gt;\(q_t = (a_t + b_t)/2\)&lt;/span&gt; (where &lt;span class=&#34;math inline&#34;&gt;\(a_t\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b_t\)&lt;/span&gt; denote the best bid and best ask)&lt;/li&gt;
+&lt;li&gt;Spread &lt;span class=&#34;math inline&#34;&gt;\(S_t= (a_t - b_t)\)&lt;/span&gt; (values below are computed in basis points relative to the concurrent midquote)&lt;/li&gt;
+&lt;li&gt;Volume is the aggretate sum of traded units of the stock. I do differentiate between hidden (&lt;code&gt;type==5&lt;/code&gt;) and visible volume.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook &amp;lt;- orderbook %&amp;gt;% mutate(midquote = ask_price_1/2 + bid_price_1/2, 
+                     spread = (ask_price_1 - bid_price_1)/midquote * 10000,
+                     volume = if_else(type ==4|type ==5, m_size, 0),
+                     hidden_volume = if_else(type ==5, m_size, 0))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As a last step, &lt;code&gt;depth&lt;/code&gt; of the orderbook denotes the number of assets that can be traded without moving the quoted price more than a given range (measured in basis points) from the concurrent midquote. The function below takes care of the slightly involved computations.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compute_depth &amp;lt;- function(df, side = &amp;quot;bid&amp;quot;, bp = 0){
+  if(side ==&amp;quot;bid&amp;quot;){
+    value_bid &amp;lt;- (1-bp/10000)*df %&amp;gt;% select(&amp;quot;bid_price_1&amp;quot;) 
+    index_bid &amp;lt;- df %&amp;gt;% select(contains(&amp;quot;bid_price&amp;quot;)) %&amp;gt;% 
+      mutate_all(function(x) {x &amp;gt;= value_bid})
+    sum_vector &amp;lt;- (df %&amp;gt;% select(contains(&amp;quot;bid_size&amp;quot;))*index_bid) %&amp;gt;% rowSums()
+  }else{
+    value_ask &amp;lt;- (1+bp/10000)*df %&amp;gt;% select(&amp;quot;ask_price_1&amp;quot;)
+    index_ask &amp;lt;- df %&amp;gt;% select(contains(&amp;quot;ask_price&amp;quot;)) %&amp;gt;% 
+      mutate_all(function(x) {x &amp;lt;= value_ask})
+    sum_vector &amp;lt;- (df %&amp;gt;% select(contains(&amp;quot;ask_size&amp;quot;))*index_ask) %&amp;gt;% rowSums()
+    
+  }
+  return(sum_vector)
+}
+
+orderbook &amp;lt;- orderbook %&amp;gt;% mutate(depth_bid = compute_depth(orderbook),
+                                  depth_ask = compute_depth(orderbook, side=&amp;quot;ask&amp;quot;),
+                                  depth_bid_5 = compute_depth(orderbook, bp = 5),
+                                  depth_ask_5 = compute_depth(orderbook, bp = 5, side=&amp;quot;ask&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Almost there! The snippet below splits the data into 20 second intervals and computes the averages of the computed summary statistics.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook_dense &amp;lt;- orderbook %&amp;gt;%
+  mutate(ts_minute = floor_date(ts, &amp;quot;20 seconds&amp;quot;)) %&amp;gt;% 
+  select(midquote:ts_minute) %&amp;gt;% 
+  group_by(ts_minute) %&amp;gt;% 
+  mutate(messages = n(),
+         volume = sum(volume),
+         hidden_volume = sum(hidden_volume)) %&amp;gt;%
+  summarise_all(mean)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here we go: during the first 100 seconds on March 17th, 20.000 messages related to the orderbook of SPY have been processed by NASDAQ. The quoted spread on average was around 3bp. On average, roughly 90.000 contracts have been traded during each 20 second slot - in other words, assets worth roughly 90 million USD have been exchanged. Quoted liquidity at the best bid and best ask seems rather small relative to the tremendous amounts of trading activity during this (very short) period of time.&lt;/p&gt;
+&lt;table&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;17%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;col width=&#34;6%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;col width=&#34;10%&#34; /&gt;
+&lt;col width=&#34;10%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;ts_minute&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;midquote&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;spread&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;volume&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;hidden_volume&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_bid&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_ask&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_bid_5&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;depth_ask_5&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;messages&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.0332&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.010257&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;89606&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;19923&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;353.7358&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;354.1362&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1854.152&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2516.916&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5890&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.2229&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.142070&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54733&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;23716&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;190.3232&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;238.8164&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2099.857&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2041.646&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3165&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:30:40&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.5052&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.177630&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;53273&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18188&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;121.9574&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;182.5553&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2113.945&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2282.149&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4246&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:31:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;245.2010&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.488751&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;146974&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;86780&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;297.4000&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;254.3316&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1985.406&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2416.603&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4210&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;2020-03-17 09:31:20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;244.6590&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.514445&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;26286&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6655&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;122.6870&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;115.6107&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2174.080&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2325.517&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2489&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Finally, some visualisation of the data at hand: The code below creates the figure at the beginning of the post and shows the dynamics of the traded prices (red line) and the quoted prices at the higher levels of the orderbook.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;orderbook_trades &amp;lt;- orderbook %&amp;gt;% 
+  filter(type==4|type==5) %&amp;gt;% 
+  select(ts, m_price)
+
+orderbook_quotes &amp;lt;- orderbook %&amp;gt;% 
+  mutate(id = row_number()) %&amp;gt;%
+  select(ts, id, matches(&amp;quot;bid|ask&amp;quot;)) %&amp;gt;% 
+  gather(level, price, -ts, -id) %&amp;gt;%
+  separate(level, into=c(&amp;quot;side&amp;quot;,&amp;quot;variable&amp;quot;,&amp;quot;level&amp;quot;), sep=&amp;quot;_&amp;quot;) %&amp;gt;%
+  mutate(level = as.numeric(level))  %&amp;gt;% 
+  spread(variable, price)
+
+p1 &amp;lt;- ggplot() + 
+  theme_bw() +
+  geom_point(data = orderbook_quotes, aes(x=ts, y=price, color=level, size = size/max(size)), alpha = 0.1)+
+  geom_line(data = orderbook_trades, aes(x=ts, y=m_price), color=&amp;#39;red&amp;#39;) + 
+  labs(title=&amp;quot;SPY: Orderbook Dynamics&amp;quot;,
+       y=&amp;quot;Price&amp;quot;,
+       x=&amp;quot;&amp;quot;) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position =&amp;quot;none&amp;quot;) +
+  scale_y_continuous()&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 </description>
     </item>
