@@ -5,12 +5,33 @@
     <link>/post/</link>
       <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Wed, 01 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 25 Mar 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
+    
+    <item>
+      <title>Advanced (tidy) Empirical Finance</title>
+      <link>/post/advanced-tidy-empirical-finance/</link>
+      <pubDate>Thu, 25 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>/post/advanced-tidy-empirical-finance/</guid>
+      <description>&lt;p&gt;During the spring semester 2021 I designed a new course &lt;em&gt;Advanced Empirical Finance: Topics and Data Science&lt;/em&gt; for the master students at KU. 
+The course aims at providing a unified coding framework in R to tackle many (probably too many) common issues in empirical finance:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Portfolio allocation and backtesting&lt;/li&gt;
+&lt;li&gt;Portfolio sorts and asset pricing tests&lt;/li&gt;
+&lt;li&gt;Machine learning in empirical asset pricing&lt;/li&gt;
+&lt;li&gt;Volatility estimation&lt;/li&gt;
+&lt;li&gt;High frequency trading and econometrics&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Along the course I collected my own R-code and curated some solutions for typical problems. 
+I will be working on updating the document further in the future, but everybody is invited to take a look, make use of the code and - even better - to provide feedback on improvements or other interesting features. 
+The 
+&lt;a href=&#34;https://bookdown.org/stefanvoigt029/Book/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;full book is available here&lt;/a&gt;, comments are very welcome.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Connect Four - Deep Reinforcement Learning</title>
