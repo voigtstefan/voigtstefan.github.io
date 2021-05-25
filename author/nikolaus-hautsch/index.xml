@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Nikolaus Hautsch | Stefan Voigt</title>
-    <link>/author/nikolaus-hautsch/</link>
-      <atom:link href="/author/nikolaus-hautsch/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://voigtstefan.me/author/nikolaus-hautsch/</link>
+      <atom:link href="https://voigtstefan.me/author/nikolaus-hautsch/index.xml" rel="self" type="application/rss+xml" />
     <description>Nikolaus Hautsch</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 20 Mar 2020 00:00:00 +0000</lastBuildDate>
     <image>
-      <url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <url>https://voigtstefan.me/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Nikolaus Hautsch</title>
-      <link>/author/nikolaus-hautsch/</link>
+      <link>https://voigtstefan.me/author/nikolaus-hautsch/</link>
     </image>
     
     <item>
       <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
-      <link>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
+      <link>https://voigtstefan.me/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
       <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
+      <guid>https://voigtstefan.me/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
       <description>&lt;p&gt;This paper replaces an earlier draft titled &amp;ldquo;Limits to Arbitrage
 in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
 </description>
@@ -24,9 +24,9 @@ in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
     
     <item>
       <title>Large Scale Portfolio Optimization under Transaction Costs and Model Uncertainty</title>
-      <link>/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
+      <link>https://voigtstefan.me/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
       <pubDate>Mon, 01 Jul 2019 00:00:00 +0000</pubDate>
-      <guid>/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
+      <guid>https://voigtstefan.me/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
       <description></description>
     </item>
     

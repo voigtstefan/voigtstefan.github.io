@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Stefan Voigt</title>
-    <link>/</link>
-      <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://voigtstefan.me/</link>
+      <atom:link href="https://voigtstefan.me/index.xml" rel="self" type="application/rss+xml" />
     <description>Stefan Voigt</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 25 Mar 2021 00:00:00 +0000</lastBuildDate>
     <image>
-      <url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <url>https://voigtstefan.me/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Stefan Voigt</title>
-      <link>/</link>
+      <link>https://voigtstefan.me/</link>
     </image>
     
     <item>
       <title>Advanced (tidy) Empirical Finance</title>
-      <link>/post/advanced-tidy-empirical-finance/</link>
+      <link>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</link>
       <pubDate>Thu, 25 Mar 2021 00:00:00 +0000</pubDate>
-      <guid>/post/advanced-tidy-empirical-finance/</guid>
+      <guid>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</guid>
       <description>&lt;p&gt;During the spring semester 2021 I designed a new course &lt;em&gt;Advanced Empirical Finance: Topics and Data Science&lt;/em&gt; for the master students at KU. 
 The course aims at providing a unified coding framework in R to tackle many (probably too many) common issues in empirical finance:&lt;/p&gt;
 &lt;ul&gt;
@@ -35,26 +35,26 @@ The
     
     <item>
       <title>Liquidity and Price Informativeness in Blockchain-Based Markets</title>
-      <link>/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</link>
+      <link>https://voigtstefan.me/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</link>
       <pubDate>Tue, 19 May 2020 00:00:00 +0000</pubDate>
-      <guid>/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</guid>
+      <guid>https://voigtstefan.me/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Connect Four - Deep Reinforcement Learning</title>
-      <link>/post/connectx/</link>
+      <link>https://voigtstefan.me/post/connectx/</link>
       <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
-      <guid>/post/connectx/</guid>
+      <guid>https://voigtstefan.me/post/connectx/</guid>
       <description>&lt;p&gt;I recently stumbled uppon 
 &lt;a href=&#34;https://www.kaggle.com/c/connectx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;the amazing Connect Kaggle Competition&lt;/a&gt; and I tried to improve my humble knowledge on reinforcement learning by participating in this challenge.&lt;/p&gt;
 &lt;h2 id=&#34;the-task&#34;&gt;The task&lt;/h2&gt;
 &lt;p&gt;Very simple: Write an agent that plays &lt;strong&gt;
 &lt;a href=&#34;https://en.wikipedia.org/wiki/Connect_Four&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Connect Four&lt;/a&gt;&lt;/strong&gt; against competing algorithms. 
-&lt;img src=&#34;/post/2020-03-27-connectx_files/connectx.PNG&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;img src=&#34;https://voigtstefan.me/post/2020-03-27-connectx_files/connectx.PNG&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h3 id=&#34;my-way-to-tackle-it-deep-q-learning&#34;&gt;My way to tackle it: &amp;ldquo;Deep&amp;rdquo; Q-Learning&lt;/h3&gt;
 &lt;p&gt;Sure, I could write some deterministic code on how to proceed in the game but what I actually implement is a seemingly brute-force method: Let the agent play the game over and over again and learn the rules the hard way. More specifically, the agents receives information on the current &lt;em&gt;observation&lt;/em&gt; (the current state of the board) and then has to take an &lt;em&gt;action&lt;/em&gt; (which slot to choose to add a coin). After that, nature responses with a new state and potentially yields a reward (if the game is won) or a penalty (if the game is lost or if the agent chooses an action that is not valid - such as putting a coin into an already full slot).&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2020-03-27-connectx_files/reinforcement_learning.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://voigtstefan.me/post/2020-03-27-connectx_files/reinforcement_learning.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;How should the agent decide on her &lt;em&gt;action&lt;/em&gt;? In finance, the concept of dynamic programming, more specifically, the Bellman-equation, is well-known: Aim at actions that yield the highest expected reward. You can do so, by value each &lt;em&gt;(action, state)&lt;/em&gt; pair with respect to the immediate rewards and the transition into the &lt;em&gt;next_state&lt;/em&gt;. More specifically, you value an &lt;em&gt;action&lt;/em&gt; $a$ given the current &lt;em&gt;state&lt;/em&gt; $s_t$ as&lt;/p&gt;
 &lt;p&gt;$$Q(a, s_t) = r + \gamma\max\limits_{a&amp;rsquo;}\hat{Q}(a&amp;rsquo;, s_{t+1})$$&lt;/p&gt;
 &lt;p&gt;where $\gamma$ is a discount factor and $\hat{Q}$ is the (predicted) value of the next state.
@@ -238,7 +238,7 @@ plt.xlabel(&#39;Episode&#39;)
 plt.ylabel(&#39;Avg rewards (100)&#39;)
 plt.show()
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2020-03-27-connectx_files/output_10_0.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://voigtstefan.me/post/2020-03-27-connectx_files/output_10_0.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;Finally, the real-life test: Submission of the agent to Kaggle. The procedure is somewhat cumbersome procedure because Kaggle does not allow &lt;code&gt;keras&lt;/code&gt; modules for submission but the below procedure seems to work&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;model = Sequential()
 model = Sequential()
@@ -323,9 +323,9 @@ Random Agent vs. My Agent: 0.24
     
     <item>
       <title>LobsteR - Analysing a Decade of High-Frequency Trading</title>
-      <link>/post/lobster-large-scale-liquidity-analysis/</link>
+      <link>https://voigtstefan.me/post/lobster-large-scale-liquidity-analysis/</link>
       <pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>/post/lobster-large-scale-liquidity-analysis/</guid>
+      <guid>https://voigtstefan.me/post/lobster-large-scale-liquidity-analysis/</guid>
       <description>
 
 
@@ -338,7 +338,7 @@ Shina App Iframe
 &lt;div id=&#34;downloading-and-extracting-massive-data&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Downloading and extracting massive data&lt;/h2&gt;
 &lt;p&gt;First, I requested &lt;strong&gt;all&lt;/strong&gt; orderbook messages from &lt;a href=&#34;www.lobsterdata.com&#34;&gt;Lobster&lt;/a&gt; up to level 10 from June 2007 until March 2020. During that period, &lt;strong&gt;SPY&lt;/strong&gt; trading was very active: I observe more than 4.26 billion messages. Total trading volume of &lt;strong&gt;SPY&lt;/strong&gt; on NASDAQ during that period exceeded 5.35 Trillion USD.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/spyder_get_data.PNG&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://voigtstefan.me/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/spyder_get_data.PNG&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Lobster compiles the data on request and provides downloadable .7z files after processing the messages. To download everything (on a Linux machine), it is advisable to make use of &lt;code&gt;wget&lt;/code&gt; (you’ll have to replace &lt;code&gt;username&lt;/code&gt;, &lt;code&gt;password&lt;/code&gt; and &lt;code&gt;user_id&lt;/code&gt; with your own credentials):&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;wget -bqc -P lobster_raw ftp://username:password@lobsterdata.com/user_id/*&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;As a next step, extract the .7z files before working with the individual files - although it is possible to read in the files from within the zipped folder, I made the experience that this can cause problems when done in parallel.&lt;/p&gt;
@@ -346,7 +346,7 @@ Shina App Iframe
 7z e .lobster_raw/SPY_2018-06-27_2019-06-26_10.7z -o./data/lobster
 7z e .lobster_raw/SPY_2017-06-27_2018-06-26_10.7z -o./data/lobster
 ....&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;3208 trading days occupy roughly 3.2 Terabyte of hard drive space. As explained in my previous post, I compute summary statistics for each single day in my sample. For the sake of brevity, the code snippet below is everything needed to do this in a straightforward parallel fashion using Slurm Workload Manager (the actual task &lt;code&gt;01_summarise_lobster_messages.R&lt;/code&gt; can be downloaded &lt;a href=&#34;/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/01_summarise_lobster_messages.R&#34;&gt;here&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;3208 trading days occupy roughly 3.2 Terabyte of hard drive space. As explained in my previous post, I compute summary statistics for each single day in my sample. For the sake of brevity, the code snippet below is everything needed to do this in a straightforward parallel fashion using Slurm Workload Manager (the actual task &lt;code&gt;01_summarise_lobster_messages.R&lt;/code&gt; can be downloaded &lt;a href=&#34;https://voigtstefan.me/post/2020-03-27-lobster-large-scale-liquidity-analysis_files/01_summarise_lobster_messages.R&#34;&gt;here&lt;/a&gt;).&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;#$ -N lobster_summary
 #$ -t 1:3208
 #$ -e SPY_Investigation/Chunk
@@ -392,7 +392,7 @@ write_csv(summary_data, paste0(&amp;quot;output/LOBSTER_&amp;quot;,asset,&amp;qu
   select(-ts_minute) %&amp;gt;% 
   summarise_all(median)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Feel free to play around with the Shiny Gadget at the beginning of the post to convince yourself: We see a negative trend in quoted spreads (apart from a couple of outliers) but as the figure below simultaneously shows, quoted depth at the best level as well as 5 basis points apart from the concurrent midquote decreased as well - note the extreme drop in liquidity provisioning since the beginning of 2020. The red line in the figure shows the daily average number of shares at the best ask (blue line corresponds to the bid). The dashed lines correspond to depth at 5 basis points (the number of shares available within 5 basis points from the midquote). Note that the y-axis is in a log scale, thus the figure hints at much more mass of the depth around the best levels.
-&lt;img src=&#34;/./2020-03-27-lobster-large-scale-liquidity-analysis_files/spy_depth.png&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;https://voigtstefan.me/./2020-03-27-lobster-large-scale-liquidity-analysis_files/spy_depth.png&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;covid19-and-the-sp500&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;COVID19 and the SP500&lt;/h2&gt;
@@ -419,9 +419,9 @@ Shina App Iframe
     
     <item>
       <title>LobsteR - NASDAQ under a &#34;tidy&#34; Microscope</title>
-      <link>/post/lobster-1/</link>
+      <link>https://voigtstefan.me/post/lobster-1/</link>
       <pubDate>Wed, 25 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>/post/lobster-1/</guid>
+      <guid>https://voigtstefan.me/post/lobster-1/</guid>
       <description>
 
 
@@ -734,9 +734,9 @@ p1 &amp;lt;- ggplot() +
     
     <item>
       <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
-      <link>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
+      <link>https://voigtstefan.me/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
       <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
+      <guid>https://voigtstefan.me/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
       <description>&lt;p&gt;This paper replaces an earlier draft titled &amp;ldquo;Limits to Arbitrage
 in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
 </description>
@@ -744,9 +744,9 @@ in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
     
     <item>
       <title>Large Scale Portfolio Optimization under Transaction Costs and Model Uncertainty</title>
-      <link>/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
+      <link>https://voigtstefan.me/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
       <pubDate>Mon, 01 Jul 2019 00:00:00 +0000</pubDate>
-      <guid>/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
+      <guid>https://voigtstefan.me/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
       <description></description>
     </item>
     
