@@ -5,12 +5,20 @@
     <link>https://voigtstefan.me/author/stefan-voigt/</link>
       <atom:link href="https://voigtstefan.me/author/stefan-voigt/index.xml" rel="self" type="application/rss+xml" />
     <description>Stefan Voigt</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 19 May 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 09 Nov 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://voigtstefan.me/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Stefan Voigt</title>
       <link>https://voigtstefan.me/author/stefan-voigt/</link>
     </image>
+    
+    <item>
+      <title>Integrating Factor Models</title>
+      <link>https://voigtstefan.me/publication/integrated-factor-models/</link>
+      <pubDate>Tue, 09 Nov 2021 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/publication/integrated-factor-models/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Liquidity and Price Informativeness in Blockchain-Based Markets</title>
