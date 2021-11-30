@@ -5,12 +5,44 @@
     <link>https://voigtstefan.me/post/</link>
       <atom:link href="https://voigtstefan.me/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 25 Mar 2021 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 25 Nov 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://voigtstefan.me/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>https://voigtstefan.me/post/</link>
     </image>
+    
+    <item>
+      <title>Thesis supervisor needed? Get in touch!</title>
+      <link>https://voigtstefan.me/post/supervision/</link>
+      <pubDate>Thu, 25 Nov 2021 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/post/supervision/</guid>
+      <description>&lt;p&gt;I regularly supervise empirical bachelor projects or master thesis in Finance on the following topics: &lt;strong&gt;Machine Learning Applications in Asset Pricing, Optimal Portfolio Choice problems or Microstructure of Decentralized Exchanges&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Do you share my enthusiasm about any of these fields? Excellent, let us get in touch!&lt;/p&gt;
+&lt;p&gt;If you would like me to supervise your thesis, do not hesitate to reach out to me after you read the information below. To make the supervision process as smooth as possible for you, I follow the following general structure and enforce few rules:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Before we get started: Drop me a mail with a maximum 1-page description of your proposed topic. You should state a first research question and a reference to one (not more, not less!) published academic journal – which you are excited about and which is closest and most relevant for your own project (preferably from one of the top 3 finance journals: &lt;em&gt;The Journal of Finance, Review of Financial Studies or Journal of Financial Economics&lt;/em&gt;). Provide a brief outline how you want to study the question, if you already have access to required data and highlight any problems that could arise along the way – the earlier we discuss potential problems, the easier the upcoming months will become.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If I do have supervision capacities, I will provide you structured feedback on your desired project such that you can start as smooth as possible. You can use my feedback to update your project description and to generate a preliminary roadmap (which indicates precise dates on which you plan to finish the individual steps). This roadmap is part of the supervision contract.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;During the semester: I leave it as your responsibility to reach out by mail when you feel that a meeting is most meaningful – it is natural that sometime there are many important changes, sometimes you will just need time for yourself to work on the project. I do not enforce a strict timeline of meetings but rather let you sign up for meetings (up to 4 for Master students, up to 2 for Bachelor students) via mail – let me know at least 8 working days in advance that you want to meet.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Before a supervision meeting: I enforce a clear structure for the supervision meetings, which requires self-assessment on an ongoing basis. Latest 48 hours before the supervision meetings you will hand in your current manuscript and a self-assessment (max 1 page) on what you think are your most relevant questions (max. 3) and your own perception of the status, including an updated version of your intended timeline. These notes are your reflections on where you are in the process, what you feel comfortable about, where you are in doubt. I will base my supervision on these comments.  Note: Without such a document and the manuscript as preparation in due time, I will cancel the meeting without replacement as I will not be able to give you high-level feedback without appropriate preparation material.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;During the supervision meeting: I will read your documents beforehand and provide feedback regarding my general assessment, the specific questions you highlighted in your preparation and my suggestions regarding the most critical tasks going forward. If necessary, you will receive a mail with my annotations on your manuscript after the meeting such that we do not have to waste time discussing on grammar, typos or formatting issues during the meeting.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Latest 48 hours after the meeting: Send me an updated roadmap – I will sign it off and you are ready to proceed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I look forward to hear about your definitely exciting research project from you as soon as possible!&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Advanced (tidy) Empirical Finance</title>
