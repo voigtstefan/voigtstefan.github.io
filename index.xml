@@ -5,12 +5,46 @@
     <link>https://voigtstefan.me/</link>
       <atom:link href="https://voigtstefan.me/index.xml" rel="self" type="application/rss+xml" />
     <description>Stefan Voigt</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 20 Dec 2021 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 16 Jan 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://voigtstefan.me/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Stefan Voigt</title>
       <link>https://voigtstefan.me/</link>
     </image>
+    
+    <item>
+      <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
+      <link>https://voigtstefan.me/publication/preprint/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
+      <pubDate>Sun, 16 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/publication/preprint/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
+      <description>&lt;p&gt;This paper replaces an earlier draft titled &amp;ldquo;Limits to Arbitrage
+in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Liquidity and Price Informativeness in Blockchain-Based Markets</title>
+      <link>https://voigtstefan.me/publication/preprint/liquidity-and-price-informativeness-in-blockchain-based-markets/</link>
+      <pubDate>Sun, 16 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/publication/preprint/liquidity-and-price-informativeness-in-blockchain-based-markets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Non-standard Errors</title>
+      <link>https://voigtstefan.me/publication/preprint/non-standard-errors/</link>
+      <pubDate>Sun, 16 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/publication/preprint/non-standard-errors/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Integrating Factor Models</title>
+      <link>https://voigtstefan.me/publication/journal-article/integrated-factor-models/</link>
+      <pubDate>Fri, 14 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/publication/journal-article/integrated-factor-models/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Call for Papers VieCo 2022 (Please circulate!)</title>
@@ -70,14 +104,6 @@ Confirmed Keynote Speakers 2022&lt;/p&gt;
     </item>
     
     <item>
-      <title>Integrating Factor Models</title>
-      <link>https://voigtstefan.me/publication/integrated-factor-models/</link>
-      <pubDate>Tue, 09 Nov 2021 00:00:00 +0000</pubDate>
-      <guid>https://voigtstefan.me/publication/integrated-factor-models/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Advanced (tidy) Empirical Finance</title>
       <link>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</link>
       <pubDate>Thu, 25 Mar 2021 00:00:00 +0000</pubDate>
@@ -96,14 +122,6 @@ I will be working on updating the document further in the future, but everybody 
 The 
 &lt;a href=&#34;https://bookdown.org/voigtstefan/aef_exercises/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;full book is available here&lt;/a&gt;, comments are very welcome.&lt;/p&gt;
 </description>
-    </item>
-    
-    <item>
-      <title>Liquidity and Price Informativeness in Blockchain-Based Markets</title>
-      <link>https://voigtstefan.me/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</link>
-      <pubDate>Tue, 19 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://voigtstefan.me/publication/liquidity-and-price-informativeness-in-blockchain-based-markets/</guid>
-      <description></description>
     </item>
     
     <item>
@@ -798,20 +816,10 @@ p1 &amp;lt;- ggplot() +
     </item>
     
     <item>
-      <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
-      <link>https://voigtstefan.me/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</link>
-      <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>https://voigtstefan.me/publication/trust-takes-time-limits-to-arbitrage-in-blockchain-based-markets/</guid>
-      <description>&lt;p&gt;This paper replaces an earlier draft titled &amp;ldquo;Limits to Arbitrage
-in Markets with Stochastic Settlement Latency&amp;rdquo;.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
       <title>Large Scale Portfolio Optimization under Transaction Costs and Model Uncertainty</title>
-      <link>https://voigtstefan.me/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
+      <link>https://voigtstefan.me/publication/journal-article/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</link>
       <pubDate>Mon, 01 Jul 2019 00:00:00 +0000</pubDate>
-      <guid>https://voigtstefan.me/publication/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
+      <guid>https://voigtstefan.me/publication/journal-article/large-scale-portfolio-optimization-under-transaction-costs-and-model-uncertainty/</guid>
       <description></description>
     </item>
     
