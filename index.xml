@@ -5,12 +5,38 @@
     <link>https://voigtstefan.me/</link>
       <atom:link href="https://voigtstefan.me/index.xml" rel="self" type="application/rss+xml" />
     <description>Stefan Voigt</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 16 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 15 Feb 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://voigtstefan.me/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Stefan Voigt</title>
       <link>https://voigtstefan.me/</link>
     </image>
+    
+    <item>
+      <title>Tidy Finance with R</title>
+      <link>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</link>
+      <pubDate>Tue, 15 Feb 2022 00:00:00 +0000</pubDate>
+      <guid>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</guid>
+      <description>&lt;p&gt;During the spring semester 2021 I designed a new course &lt;em&gt;Advanced Empirical Finance: Topics and Data Science&lt;/em&gt; for the master students at KU. 
+The course aims at providing a unified coding framework in R to tackle many (probably too many) common issues in empirical finance:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Portfolio allocation and backtesting&lt;/li&gt;
+&lt;li&gt;Portfolio sorts and asset pricing tests&lt;/li&gt;
+&lt;li&gt;Machine learning in empirical asset pricing&lt;/li&gt;
+&lt;li&gt;Volatility estimation&lt;/li&gt;
+&lt;li&gt;High frequency trading and econometrics&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Along the course I collected my own R-code and curated some solutions for typical problems. 
+Together with my colleagues 
+&lt;a href=&#34;https://christophscheuch.github.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Christoph Scheuch&lt;/a&gt; and 
+&lt;a href=&#34;https://sites.google.com/view/patrick-weiss&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Patrick Weiss&lt;/a&gt; we created an entire textbook: This book aims to lift this curtain on reproducible finance by providing a fully transparent code base for many common financial applications. We hope to inspire others in sharing their code publicly and taking part in our journey towards more reproducible research in the future.&lt;/p&gt;
+&lt;p&gt;We will keep on working on updating the document further in the future, but everybody is invited to take a look, make use of the code and - even better - to provide feedback on improvements or other interesting features.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The 
+&lt;a href=&#34;https://tidy-finance.org?utm_source=voigtstefan.me&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;full book is available here&lt;/a&gt;&lt;/strong&gt;, comments are very welcome.&lt;/p&gt;
+&lt;p&gt;We are grateful for any kind of feedback on every aspect of the book. So please get in touch with us via 
+&lt;a href=&#34;mailto:contact@tidy-finance.org&#34;&gt;contact@tidy-finance.org&lt;/a&gt; if you spot typos, discover any issues that deserve more attention, or if you have suggestions for additional chapters and sections.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Building Trust Takes Time: Limits to Arbitrage in Blockchain-Based Markets</title>
@@ -100,27 +126,6 @@ Confirmed Keynote Speakers 2022&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;I look forward to hear about your definitely exciting research project from you as soon as possible!&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Advanced (tidy) Empirical Finance</title>
-      <link>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</link>
-      <pubDate>Thu, 25 Mar 2021 00:00:00 +0000</pubDate>
-      <guid>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</guid>
-      <description>&lt;p&gt;During the spring semester 2021 I designed a new course &lt;em&gt;Advanced Empirical Finance: Topics and Data Science&lt;/em&gt; for the master students at KU. 
-The course aims at providing a unified coding framework in R to tackle many (probably too many) common issues in empirical finance:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Portfolio allocation and backtesting&lt;/li&gt;
-&lt;li&gt;Portfolio sorts and asset pricing tests&lt;/li&gt;
-&lt;li&gt;Machine learning in empirical asset pricing&lt;/li&gt;
-&lt;li&gt;Volatility estimation&lt;/li&gt;
-&lt;li&gt;High frequency trading and econometrics&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Along the course I collected my own R-code and curated some solutions for typical problems. 
-I will be working on updating the document further in the future, but everybody is invited to take a look, make use of the code and - even better - to provide feedback on improvements or other interesting features. 
-The 
-&lt;a href=&#34;https://bookdown.org/voigtstefan/aef_exercises/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;full book is available here&lt;/a&gt;, comments are very welcome.&lt;/p&gt;
 </description>
     </item>
     

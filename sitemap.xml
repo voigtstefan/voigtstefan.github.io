@@ -3,6 +3,21 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://voigtstefan.me/post/</loc>
+    <lastmod>2022-02-15T10:56:37+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://voigtstefan.me/</loc>
+    <lastmod>2022-02-15T10:56:37+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</loc>
+    <lastmod>2022-02-15T10:56:37+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://voigtstefan.me/publication-type/3/</loc>
     <lastmod>2022-01-16T00:00:00+00:00</lastmod>
   </url>
@@ -58,11 +73,6 @@
   </url>
   
   <url>
-    <loc>https://voigtstefan.me/</loc>
-    <lastmod>2022-01-16T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://voigtstefan.me/publication-type/2/</loc>
     <lastmod>2022-01-14T00:00:00+00:00</lastmod>
   </url>
@@ -93,18 +103,8 @@
   </url>
   
   <url>
-    <loc>https://voigtstefan.me/post/</loc>
-    <lastmod>2021-12-20T16:56:37+01:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://voigtstefan.me/post/supervision/</loc>
     <lastmod>2021-11-25T16:56:37+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://voigtstefan.me/post/advanced-tidy-empirical-finance/</loc>
-    <lastmod>2021-03-25T16:56:37+01:00</lastmod>
   </url>
   
   <url>
