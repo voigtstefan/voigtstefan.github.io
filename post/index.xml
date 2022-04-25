@@ -92,6 +92,11 @@ Confirmed Keynote Speakers 2022&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;I look forward to hear about your definitely exciting research project from you as soon as possible!&lt;/p&gt;
+&lt;!-- Calendly badge widget begin --&gt;
+&lt;link href=&#34;https://assets.calendly.com/assets/external/widget.css&#34; rel=&#34;stylesheet&#34;&gt;
+&lt;script src=&#34;https://assets.calendly.com/assets/external/widget.js&#34; type=&#34;text/javascript&#34; async&gt;&lt;/script&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;window.onload = function() { Calendly.initBadgeWidget({ url: &#39;https://calendly.com/voigtstefan&#39;, text: &#39;Supervision meeting needed? Arrange here!&#39;, color: &#39;#ff1600&#39;, textColor: &#39;#ffffff&#39;, branding: true }); }&lt;/script&gt;
+&lt;!-- Calendly badge widget end --&gt;
 </description>
     </item>
     
